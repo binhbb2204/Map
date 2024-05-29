@@ -1,0 +1,65 @@
+29-May-2024 11:50:50.475 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/10.1.24
+29-May-2024 11:50:50.481 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          May 9 2024 17:41:23 UTC
+29-May-2024 11:50:50.482 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 10.1.24.0
+29-May-2024 11:50:50.485 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 11
+29-May-2024 11:50:50.488 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+29-May-2024 11:50:50.490 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+29-May-2024 11:50:50.492 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Java\jdk-21
+29-May-2024 11:50:50.494 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           21.0.2+13-LTS-58
+29-May-2024 11:50:50.495 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+29-May-2024 11:50:50.496 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24
+29-May-2024 11:50:50.497 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24
+29-May-2024 11:50:50.523 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\logging.properties
+29-May-2024 11:50:50.523 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+29-May-2024 11:50:50.523 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djdk.tls.ephemeralDHKeySize=2048
+29-May-2024 11:50:50.524 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.protocol.handler.pkgs=org.apache.catalina.webresources
+29-May-2024 11:50:50.524 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.lang=ALL-UNNAMED
+29-May-2024 11:50:50.524 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.io=ALL-UNNAMED
+29-May-2024 11:50:50.524 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util=ALL-UNNAMED
+29-May-2024 11:50:50.524 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+29-May-2024 11:50:50.524 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+29-May-2024 11:50:50.524 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24
+29-May-2024 11:50:50.524 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24
+29-May-2024 11:50:50.525 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\temp
+29-May-2024 11:50:50.528 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded Apache Tomcat Native library [2.0.7] using APR version [1.7.4].
+29-May-2024 11:50:50.534 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized [OpenSSL 3.0.13 30 Jan 2024]
+29-May-2024 11:50:50.890 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+29-May-2024 11:50:50.919 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [723] milliseconds
+29-May-2024 11:50:51.017 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+29-May-2024 11:50:51.018 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/10.1.24]
+29-May-2024 11:50:51.029 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\webapps\docs]
+29-May-2024 11:50:51.408 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\webapps\docs] has finished in [378] ms
+29-May-2024 11:50:51.408 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\webapps\examples]
+29-May-2024 11:50:51.865 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\webapps\examples] has finished in [457] ms
+29-May-2024 11:50:51.865 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\webapps\host-manager]
+29-May-2024 11:50:51.907 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\webapps\host-manager] has finished in [42] ms
+29-May-2024 11:50:51.907 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\webapps\manager]
+29-May-2024 11:50:51.942 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\webapps\manager] has finished in [35] ms
+29-May-2024 11:50:51.942 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\webapps\ROOT]
+29-May-2024 11:50:51.963 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\webapps\ROOT] has finished in [21] ms
+29-May-2024 11:50:51.967 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+29-May-2024 11:50:51.996 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [1076] milliseconds
+29-May-2024 12:01:21.554 INFO [http-nio-8080-exec-2] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml]
+29-May-2024 12:01:21.555 WARNING [http-nio-8080-exec-2] org.apache.catalina.startup.HostConfig.deployDescriptor The path attribute with value [/GoogleMap] in deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml] has been ignored
+29-May-2024 12:01:21.598 INFO [http-nio-8080-exec-2] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml] has finished in [43] ms
+29-May-2024 12:01:21.603 INFO [http-nio-8080-exec-1] org.apache.catalina.util.LifecycleBase.start The start() method was called on component [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/GoogleMap]] after start() had already been called. The second call will be ignored.
+29-May-2024 12:01:59.985 INFO [http-nio-8080-exec-8] org.apache.catalina.startup.HostConfig.undeploy Undeploying context [/GoogleMap]
+29-May-2024 12:02:00.028 INFO [http-nio-8080-exec-10] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml]
+29-May-2024 12:02:00.029 WARNING [http-nio-8080-exec-10] org.apache.catalina.startup.HostConfig.deployDescriptor The path attribute with value [/GoogleMap] in deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml] has been ignored
+29-May-2024 12:02:00.059 INFO [http-nio-8080-exec-10] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml] has finished in [31] ms
+29-May-2024 12:02:00.064 INFO [http-nio-8080-exec-9] org.apache.catalina.util.LifecycleBase.start The start() method was called on component [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/GoogleMap]] after start() had already been called. The second call will be ignored.
+29-May-2024 12:02:57.047 INFO [http-nio-8080-exec-9] org.apache.catalina.startup.HostConfig.undeploy Undeploying context [/GoogleMap]
+29-May-2024 12:02:57.073 INFO [http-nio-8080-exec-1] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml]
+29-May-2024 12:02:57.074 WARNING [http-nio-8080-exec-1] org.apache.catalina.startup.HostConfig.deployDescriptor The path attribute with value [/GoogleMap] in deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml] has been ignored
+29-May-2024 12:02:57.107 INFO [http-nio-8080-exec-1] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml] has finished in [34] ms
+29-May-2024 12:02:57.112 INFO [http-nio-8080-exec-10] org.apache.catalina.util.LifecycleBase.start The start() method was called on component [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/GoogleMap]] after start() had already been called. The second call will be ignored.
+29-May-2024 12:03:52.046 INFO [http-nio-8080-exec-15] org.apache.catalina.startup.HostConfig.undeploy Undeploying context [/GoogleMap]
+29-May-2024 12:03:52.070 INFO [http-nio-8080-exec-16] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml]
+29-May-2024 12:03:52.071 WARNING [http-nio-8080-exec-16] org.apache.catalina.startup.HostConfig.deployDescriptor The path attribute with value [/GoogleMap] in deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml] has been ignored
+29-May-2024 12:03:52.102 INFO [http-nio-8080-exec-16] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\ApacheTomcat\apache-tomcat-10.1.24-windows-x64\apache-tomcat-10.1.24\conf\Catalina\localhost\GoogleMap.xml] has finished in [32] ms
+29-May-2024 12:03:52.107 INFO [http-nio-8080-exec-9] org.apache.catalina.util.LifecycleBase.start The start() method was called on component [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/GoogleMap]] after start() had already been called. The second call will be ignored.
+29-May-2024 12:33:38.741 INFO [main] org.apache.catalina.core.StandardServer.await A valid shutdown command was received via the shutdown port. Stopping the Server instance.
+29-May-2024 12:33:38.742 INFO [main] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["http-nio-8080"]
+29-May-2024 12:33:38.748 INFO [main] org.apache.catalina.core.StandardService.stopInternal Stopping service [Catalina]
+29-May-2024 12:33:38.768 INFO [main] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["http-nio-8080"]
+29-May-2024 12:33:38.789 INFO [main] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["http-nio-8080"]
