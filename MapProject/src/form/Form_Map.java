@@ -2,6 +2,12 @@
 package form;
 
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.JOptionPane;
 import javax.swing.event.MouseInputListener;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.VirtualEarthTileFactoryInfo;
@@ -10,10 +16,17 @@ import org.jxmapviewer.input.ZoomMouseWheelListenerCenter;
 import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactoryInfo;
+import org.jxmapviewer.viewer.WaypointPainter;
+
+import main.Main;
+import waypoint.EventWaypoint;
+import waypoint.MyWaypoint;
+import waypoint.WaypointRender;
 
 
 public class Form_Map extends javax.swing.JPanel {
-
+    private final Set<MyWaypoint> waypoints = new HashSet<>();
+    private EventWaypoint event;
     public Form_Map() {
         initComponents();
         init();
@@ -32,7 +45,56 @@ public class Form_Map extends javax.swing.JPanel {
         jXMapViewer.addMouseListener(mm);
         jXMapViewer.addMouseMotionListener(mm);
         jXMapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(jXMapViewer));
+
+        jXMapViewer.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                GeoPosition clickedGeoPosition = jXMapViewer.convertPointToGeoPosition(e.getPoint());
+                handleMapClick(clickedGeoPosition);
+            }
+        });
         
+    }
+    private void handleMapClick(GeoPosition position) {
+        // Log and display the coordinates of the click
+        System.out.println("Map clicked at: " + position.getLatitude() + ", " + position.getLongitude());
+        // Add a waypoint at the clicked position
+        MyWaypoint newWaypoint = new MyWaypoint("New Waypoint", MyWaypoint.PointType.END, event, position);
+        addWaypoint(newWaypoint);
+    }
+    
+    private void addWaypoint(MyWaypoint waypoint) {
+        for (MyWaypoint d : waypoints) {
+            jXMapViewer.remove(d.getButton());
+        }
+        waypoints.add(waypoint);
+        initWaypoint();
+    }
+
+    private void initWaypoint() {
+        WaypointPainter<MyWaypoint> wp = new WaypointRender();
+        wp.setWaypoints(waypoints);
+        jXMapViewer.setOverlayPainter(wp);
+        for (MyWaypoint d : waypoints) {
+            jXMapViewer.add(d.getButton());
+        }
+    }
+
+    private void clearWaypoint() {
+        for (MyWaypoint d : waypoints) {
+            jXMapViewer.remove(d.getButton());
+        }
+        waypoints.clear();
+        initWaypoint();
+    }
+
+    private EventWaypoint getEvent() {
+        return new EventWaypoint() {
+            @Override
+            public void selected(MyWaypoint waypoint) {
+                JOptionPane.showMessageDialog(Form_Map.this, waypoint.getName());
+            }
+        };
     }
 
     /**
