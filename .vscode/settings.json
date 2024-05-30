@@ -7,6 +7,7 @@
         "MapProject/src/org/AbsoluteLayout-RELEASE200.jar",
         "MapProject/src/org/filters-2.0.235.jar",
         "MapProject/src/org/swing-worker-1.1.jar",
-        "MapProject/src/org/swingx-1.6.1.jar"
+        "MapProject/src/org/swingx-1.6.1.jar",
+        "MapProject/src/org/miglayout-4.0.jar"
     ]
 }
