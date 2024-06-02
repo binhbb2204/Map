@@ -39,6 +39,7 @@ import waypoint.WaypointRender;
 
 public class Form_Map extends javax.swing.JPanel {
     private final List<MyWaypoint> waypoints = new ArrayList<>();
+    private final WaypointPainter<MyWaypoint> waypointPainter = new WaypointRender();
     private EventWaypoint event;
     public Form_Map() {
         initComponents();
@@ -72,6 +73,7 @@ public class Form_Map extends javax.swing.JPanel {
                 }
             }
         });
+        
         
     }
     private void handleMapClick(GeoPosition position) {
@@ -109,13 +111,67 @@ public class Form_Map extends javax.swing.JPanel {
     
 
     private void initWaypoint() {
-        WaypointPainter<MyWaypoint> wp = new WaypointRender();
-        Set<MyWaypoint> waypointSet = new HashSet<>(waypoints); 
-        wp.setWaypoints(waypointSet);
-        jXMapViewer.setOverlayPainter(wp);
-        for (MyWaypoint d : waypoints) {
-            jXMapViewer.add(d.getButton());
+        // Create a waypoint painter and set the waypoints
+        WaypointPainter<MyWaypoint> waypointPainter = new WaypointRender();
+        Set<MyWaypoint> waypointSet = new HashSet<>(waypoints);
+        waypointPainter.setWaypoints(waypointSet);
+    
+        // Create a compound painter to combine multiple painters
+        CompoundPainter<JXMapViewer> compoundPainter = new CompoundPainter<>();
+    
+        // Add the waypoint painter to the compound painter
+        compoundPainter.addPainter(waypointPainter);
+    
+        // Create and populate the graph with your waypoints and the distances between them
+        Graph graph = new Graph();
+        populateGraphWithEdges(graph); // This method will add all the necessary edges to the graph
+    
+        // Check if there are exactly two waypoints to draw a route
+        if (waypoints.size() == 2) {
+            // Get the shortest path using Dijkstra's algorithm
+            List<GeoPosition> shortestPath = Dijkstra.computeShortestPath(
+                graph,
+                waypoints.get(0).getPosition(),
+                waypoints.get(1).getPosition()
+            );
+    
+            // If a path exists, create a route painter and add it to the compound painter
+            if (shortestPath != null && !shortestPath.isEmpty()) {
+                RoutePainter routePainter = new RoutePainter(shortestPath);
+                compoundPainter.addPainter(routePainter);
+            }
         }
+    
+        // Set the compound painter as the overlay painter on the JXMapViewer
+        jXMapViewer.setOverlayPainter(compoundPainter);
+    
+        // Add buttons for each waypoint
+        for (MyWaypoint waypoint : waypoints) {
+            jXMapViewer.add(waypoint.getButton());
+        }
+    
+        // Refresh the map viewer to display the new route
+        jXMapViewer.repaint();
+    }
+
+    private void populateGraphWithEdges(Graph graph) {
+        for (int i = 0; i < waypoints.size(); i++) {
+            for (int j = i + 1; j < waypoints.size(); j++) {
+                double distance = calculateDistance(waypoints.get(i).getPosition(), waypoints.get(j).getPosition());
+                graph.addEdge(waypoints.get(i).getPosition(), waypoints.get(j).getPosition(), distance);
+                graph.addEdge(waypoints.get(j).getPosition(), waypoints.get(i).getPosition(), distance);
+            }
+        }
+    }
+    private double calculateDistance(GeoPosition pos1, GeoPosition pos2) {
+        double earthRadius = 6371.01; // Earth's radius in kilometers
+        double latDiff = Math.toRadians(pos2.getLatitude() - pos1.getLatitude());
+        double lonDiff = Math.toRadians(pos2.getLongitude() - pos1.getLongitude());
+        double a = Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
+                   Math.cos(Math.toRadians(pos1.getLatitude())) * Math.cos(Math.toRadians(pos2.getLatitude())) *
+                   Math.sin(lonDiff / 2) * Math.sin(lonDiff / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return earthRadius * c;
     }
 
     private void clearWaypoint() {

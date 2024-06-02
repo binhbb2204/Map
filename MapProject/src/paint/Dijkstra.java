@@ -1,73 +1,72 @@
 package paint;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
+import org.jxmapviewer.viewer.GeoPosition;
 
-import waypoint.MyWaypoint;
+import java.util.*;
 
 public class Dijkstra {
-    public static class ShortestPathResult {
-        private final Map<MyWaypoint, Double> distances;
-        private final Map<MyWaypoint, MyWaypoint> predecessors;
+    public static List<GeoPosition> computeShortestPath(Graph graph, GeoPosition source, GeoPosition destination) {
+        Set<GeoPosition> settledNodes = new HashSet<>();
+        Set<GeoPosition> unsettledNodes = new HashSet<>();
+        Map<GeoPosition, GeoPosition> predecessors = new HashMap<>();
+        Map<GeoPosition, Double> distance = new HashMap<>();
 
-        public ShortestPathResult(Map<MyWaypoint, Double> distances, Map<MyWaypoint, MyWaypoint> predecessors) {
-            this.distances = distances;
-            this.predecessors = predecessors;
-        }
+        distance.put(source, 0.0);
+        unsettledNodes.add(source);
 
-        public Map<MyWaypoint, Double> getDistances() {
-            return distances;
-        }
-
-        public Map<MyWaypoint, MyWaypoint> getPredecessors() {
-            return predecessors;
-        }
-    }
-
-    public static ShortestPathResult shortestPath(Graph graph, MyWaypoint source) {
-        Map<MyWaypoint, Double> distances = new HashMap<>();
-        Map<MyWaypoint, MyWaypoint> predecessors = new HashMap<>();
-        Set<MyWaypoint> visited = new HashSet<>();
-        PriorityQueue<MyWaypoint> queue = new PriorityQueue<>(
-            (w1, w2) -> Double.compare(distances.getOrDefault(w1, Double.MAX_VALUE), distances.getOrDefault(w2, Double.MAX_VALUE))
-        );
-
-        // Initialize distances and queue
-        for (MyWaypoint vertex : graph.getVertices()) {
-            distances.put(vertex, Double.MAX_VALUE);
-            queue.add(vertex);
-        }
-        distances.put(source, 0.0);
-
-        // Main loop of Dijkstra's algorithm
-        while (!queue.isEmpty()) {
-            MyWaypoint current = queue.poll();
-            visited.add(current);
-
-            // Examine and relax all adjacent vertices
-            for (Map.Entry<MyWaypoint, Double> neighborEntry : graph.getNeighbors(current).entrySet()) {
-                MyWaypoint neighbor = neighborEntry.getKey();
-                if (visited.contains(neighbor)) {
-                    continue;
-                }
-
-                double edgeWeight = neighborEntry.getValue();
-                double newDistance = distances.get(current) + edgeWeight;
-
-                if (newDistance < distances.get(neighbor)) {
-                    distances.put(neighbor, newDistance);
-                    predecessors.put(neighbor, current);
-
-                    // Update the priority queue
-                    queue.remove(neighbor);
-                    queue.add(neighbor);
+        while (unsettledNodes.size() != 0) {
+            GeoPosition currentNode = getLowestDistanceNode(unsettledNodes, distance);
+            unsettledNodes.remove(currentNode);
+            for (Graph.Edge edge : graph.getEdges(currentNode)) {
+                GeoPosition adjacentNode = edge.getDestination();
+                double edgeWeight = edge.getWeight();
+                if (!settledNodes.contains(adjacentNode)) {
+                    calculateMinimumDistance(adjacentNode, edgeWeight, currentNode, distance, predecessors);
+                    unsettledNodes.add(adjacentNode);
                 }
             }
+            settledNodes.add(currentNode);
         }
 
-        return new ShortestPathResult(distances, predecessors);
+        return getPath(destination, predecessors);
+    }
+
+    private static List<GeoPosition> getPath(GeoPosition destination, Map<GeoPosition, GeoPosition> predecessors) {
+        List<GeoPosition> path = new LinkedList<>();
+        GeoPosition step = destination;
+        // Check if a path exists
+        if (predecessors.get(step) == null) {
+            return path; // empty list means no path exists
+        }
+        path.add(step);
+        while (predecessors.get(step) != null) {
+            step = predecessors.get(step);
+            path.add(step);
+        }
+        // Put it into the correct order
+        Collections.reverse(path);
+        return path;
+    }
+
+    private static GeoPosition getLowestDistanceNode(Set<GeoPosition> unsettledNodes, Map<GeoPosition, Double> distance) {
+        GeoPosition lowestDistanceNode = null;
+        double lowestDistance = Double.MAX_VALUE;
+        for (GeoPosition node : unsettledNodes) {
+            double nodeDistance = distance.get(node);
+            if (nodeDistance < lowestDistance) {
+                lowestDistance = nodeDistance;
+                lowestDistanceNode = node;
+            }
+        }
+        return lowestDistanceNode;
+    }
+
+    private static void calculateMinimumDistance(GeoPosition evaluationNode, double edgeWeigh, GeoPosition sourceNode, Map<GeoPosition, Double> distance, Map<GeoPosition, GeoPosition> predecessors) {
+        Double sourceDistance = distance.get(sourceNode);
+        if (sourceDistance + edgeWeigh < distance.getOrDefault(evaluationNode, Double.MAX_VALUE)) {
+            distance.put(evaluationNode, sourceDistance + edgeWeigh);
+            predecessors.put(evaluationNode, sourceNode);
+        }
     }
 }
+
