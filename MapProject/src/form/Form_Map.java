@@ -1,22 +1,22 @@
 
 package form;
 
-
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.VirtualEarthTileFactoryInfo;
@@ -27,10 +27,10 @@ import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.jxmapviewer.viewer.WaypointPainter;
-import org.jxmapviewer.viewer.WaypointRenderer;
+
+import com.github.kevinsawicki.http.HttpRequest;
 
 import paint.Dijkstra;
-import paint.DistanceCalculator;
 import paint.Graph;
 import paint.RoutePainter;
 import waypoint.EventWaypoint;
@@ -44,6 +44,8 @@ public class Form_Map extends javax.swing.JPanel {
     public Form_Map() {
         initComponents();
         init();
+        setupTextFields();
+        
     }
 
 
@@ -76,12 +78,116 @@ public class Form_Map extends javax.swing.JPanel {
         
         
     }
+    private void setupTextFields() {
+        // Add key listener to txtFrom
+        txtFrom.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    handleLocationInput(txtFrom.getText());
+                }
+            }
+        });
+
+        // Add key listener to txtTo
+        txtTo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                    handleLocationInput(txtTo.getText());
+                }
+            }
+        });
+    }
+
+    private void handleLocationInput(String locationName) {
+        try {
+            GeoPosition position = getLocationFromAPI(locationName);
+            System.out.println("Location: " + locationName);
+            System.out.println("Latitude: " + position.getLatitude() + ", Longitude: " + position.getLongitude());
+
+            // Create a new waypoint with the retrieved position
+            MyWaypoint newWaypoint = new MyWaypoint("New Waypoint", MyWaypoint.PointType.END, event, position);
+
+            // Add the new waypoint
+            addWaypoint(newWaypoint);
+        } catch (JSONException e) {
+            System.err.println("Error retrieving location: " + e.getMessage());
+        }
+    }
     private void handleMapClick(GeoPosition position) {
         // Log and display the coordinates of the click
         System.out.println("Map clicked at: " + position.getLatitude() + ", " + position.getLongitude());
+
+        try {
+            // Get and print the location based on the clicked position
+            String location = getLocation(position);
+            System.out.println("Location: " + location);
+            int id = getOSM_ID(position);
+            System.out.println(id);
+
+        } 
+        catch (JSONException e) {
+            System.err.println("Failed to parse JSON response: " + e.getMessage());
+        } 
+        
         // Add a waypoint at the clicked position
         MyWaypoint newWaypoint = new MyWaypoint("New Waypoint", MyWaypoint.PointType.END, event, position);
         addWaypoint(newWaypoint);
+    }
+    
+    public String getLocation(GeoPosition pos) throws JSONException{
+        String body = HttpRequest.get("https://nominatim.openstreetmap.org/reverse?lat=" + pos.getLatitude() + "&lon=" + pos.getLongitude() + "&format=json").body();
+        JSONObject json = new JSONObject(body);
+        return json.getString("display_name");
+    }
+    public int getOSM_ID(GeoPosition pos) throws JSONException{
+        String body = HttpRequest.get("https://nominatim.openstreetmap.org/reverse?lat=" + pos.getLatitude() + "&lon=" + pos.getLongitude() + "&format=json").body();
+        JSONObject json = new JSONObject(body);
+        return json.getInt("osm_id");
+    }
+    private GeoPosition getLocationFromAPI(String query) throws JSONException {
+        if (query == null || query.trim().isEmpty()) {
+            System.out.println("Query is empty or null.");
+            return null; // Or return a default GeoPosition if appropriate
+        }
+
+        try {
+            String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
+            String url = "https://nominatim.openstreetmap.org/search?q=" + encodedQuery + "&format=json";
+            System.out.println("API URL: " + url); // Print the full API URL for debugging
+
+            String body = HttpRequest.get(url).body();
+            System.out.println("Raw JSON response: " + body);
+
+            // Check if the response is an empty array
+            if (body.trim().equals("[]")) {
+                System.out.println("No results found for the query: " + query);
+                return null; // Or return a default GeoPosition if appropriate
+            }
+
+            JSONArray jsonArray = new JSONArray(body.trim());
+            if (jsonArray.length() == 0) {
+                System.out.println("No results found in the JSON array.");
+                return null; // Or return a default GeoPosition if appropriate
+            }
+
+            JSONObject json = jsonArray.getJSONObject(0); // Get the first result
+            double lat = json.getDouble("lat");
+            double lon = json.getDouble("lon");
+            return new GeoPosition(lat, lon);
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+
+    public GeoPosition setLocationFrom(String name) throws JSONException {
+        return getLocationFromAPI(txtFrom.getText());
+    }
+
+    public GeoPosition setLocationTo(String name) throws JSONException {
+        return getLocationFromAPI(txtTo.getText());
     }
     
     private void addWaypoint(MyWaypoint newWaypoint) {
@@ -98,6 +204,7 @@ public class Form_Map extends javax.swing.JPanel {
                 // Replace the existing waypoint with the new one
                 waypoints.set(i, newWaypoint);
                 jXMapViewer.remove(existingWaypoint.getButton());
+                updateTextFields();
                 initWaypoint();
                 return;
             }
@@ -105,10 +212,26 @@ public class Form_Map extends javax.swing.JPanel {
     
         // Add the new waypoint if it's unique
         waypoints.add(newWaypoint);
+        updateTextFields();
         initWaypoint();
     }
+    private void updateTextFields() {
+        if (waypoints.size() > 0) {
+            MyWaypoint firstWaypoint = waypoints.get(0);
+            String location = getLocation(firstWaypoint.getPosition());
+            txtFrom.setText(location);
+        } else {
+            txtFrom.setText("");
+        }
     
-    
+        if (waypoints.size() > 1) {
+            MyWaypoint secondWaypoint = waypoints.get(1);
+            String location = getLocation(secondWaypoint.getPosition());
+            txtTo.setText(location);
+        } else {
+            txtTo.setText("");
+        }
+    }
 
     private void initWaypoint() {
         // Create a waypoint painter and set the waypoints
@@ -202,7 +325,10 @@ public class Form_Map extends javax.swing.JPanel {
 
         jXMapViewer = new org.jxmapviewer.JXMapViewer();
         comboMapType = new combo_suggestion.ComboBoxSuggestion();
-        header1 = new component.Header();
+        jLabel1 = new javax.swing.JLabel();
+        txtFrom = new swing.MyTextField();
+        jLabel2 = new javax.swing.JLabel();
+        txtTo = new swing.MyTextField();
 
         comboMapType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Open Street", "Virtual Earth", "Hybrid", "Statelite" }));
         comboMapType.addActionListener(new java.awt.event.ActionListener() {
@@ -211,33 +337,53 @@ public class Form_Map extends javax.swing.JPanel {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 51, 102));
+        jLabel1.setText("From");
+
+        jLabel2.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(0, 51, 102));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel2.setText("To");
+
         javax.swing.GroupLayout jXMapViewerLayout = new javax.swing.GroupLayout(jXMapViewer);
         jXMapViewer.setLayout(jXMapViewerLayout);
         jXMapViewerLayout.setHorizontalGroup(
             jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jXMapViewerLayout.createSequentialGroup()
+            .addGroup(jXMapViewerLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(header1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 328, Short.MAX_VALUE)
+                .addGroup(jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtTo, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 300, Short.MAX_VALUE)
                 .addComponent(comboMapType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jXMapViewerLayout.setVerticalGroup(
             jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jXMapViewerLayout.createSequentialGroup()
-                .addComponent(comboMapType, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(jXMapViewerLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(header1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(368, Short.MAX_VALUE))
+                .addGroup(jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtFrom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(comboMapType, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(10, 10, 10)
+                .addGroup(jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(389, 389, 389))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jXMapViewer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -273,7 +419,10 @@ public class Form_Map extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private combo_suggestion.ComboBoxSuggestion comboMapType;
-    private component.Header header1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private org.jxmapviewer.JXMapViewer jXMapViewer;
+    private swing.MyTextField txtFrom;
+    private swing.MyTextField txtTo;
     // End of variables declaration//GEN-END:variables
 }

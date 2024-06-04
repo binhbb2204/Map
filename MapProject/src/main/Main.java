@@ -12,6 +12,9 @@ public class Main extends javax.swing.JFrame {
     public Main() {
         initComponents();
         setBackground(new Color(0, 0, 0, 0));
+        
+        setPreferredSize(new Dimension(1500, 800));
+        pack();  // Adjusts the frame to fit the preferred size
         setLocationRelativeTo(null);
         map = new Form_Map();
         menu.initMoving(Main.this);
@@ -80,10 +83,10 @@ public class Main extends javax.swing.JFrame {
             panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(menu, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBorder1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(7, 7, 7)
                 .addComponent(exitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 544, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 544, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
