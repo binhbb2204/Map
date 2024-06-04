@@ -68,6 +68,8 @@ public class Form_Map extends javax.swing.JPanel {
                 if (SwingUtilities.isRightMouseButton(e)) {
                     // Clear all waypoints on right-click
                     clearWaypoint();
+                    txtFrom.setText("");
+                    txtTo.setText("");
                 } else if (SwingUtilities.isLeftMouseButton(e)) {
                     // Handle left-click as before
                     GeoPosition clickedGeoPosition = jXMapViewer.convertPointToGeoPosition(e.getPoint());
@@ -338,11 +340,9 @@ public class Form_Map extends javax.swing.JPanel {
         });
 
         jLabel1.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 51, 102));
         jLabel1.setText("From");
 
         jLabel2.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 51, 102));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel2.setText("To");
 
