@@ -50,12 +50,14 @@ public class Form_Map extends javax.swing.JPanel {
     private Model_RouteHopper routeHopper;
     private GeoPosition fromPosition = null;
     private GeoPosition toPosition = null;
+    private Graph graph;
     public Form_Map() {
         initComponents();
         init();
         setupTextFields();
         graphHopper = new Model_GraphHopper();
         routeHopper = new Model_RouteHopper();
+        graph = new Graph();
     }
         
     private void handleResponse(String response) {
@@ -79,7 +81,7 @@ public class Form_Map extends javax.swing.JPanel {
                     
 
                 }
-                initWaypoint(pathPoints);
+                initRoute(graph, pathPoints);
             }
         }
     }
@@ -258,43 +260,44 @@ public class Form_Map extends javax.swing.JPanel {
         return json.getInt("osm_id");
     }
     private GeoPosition getLocationFromAPI(String query) throws JSONException {
-        if (query == null || query.trim().isEmpty()) {
-            System.out.println("Query is empty or null.");
+    if (query == null || query.trim().isEmpty()) {
+        System.out.println("Query is empty or null.");
+        return null; // Or return a default GeoPosition if appropriate
+    }
+
+    try {
+        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
+        String url = "https://nominatim.openstreetmap.org/search?q=" + encodedQuery + "&format=json";
+        System.out.println("API URL: " + url); // Print the full API URL for debugging
+
+        String body = HttpRequest.get(url).body();
+        System.out.println("Raw JSON response: " + body);
+
+        // Check if the response is an empty array
+        if (body.trim().equals("[]")) {
+            System.out.println("No results found for the query: " + query);
+            Error.setData(new Model_Error("No results found for the query: " + query));
+            GlassPanePopup.showPopup(Error);
             return null; // Or return a default GeoPosition if appropriate
         }
 
-        try {
-            String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
-            String url = "https://nominatim.openstreetmap.org/search?q=" + encodedQuery + "&format=json";
-            System.out.println("API URL: " + url); // Print the full API URL for debugging
-
-            String body = HttpRequest.get(url).body();
-            System.out.println("Raw JSON response: " + body);
-
-            // Check if the response is an empty array
-            if (body.trim().equals("[]")) {
-                System.out.println("No results found for the query: " + query);
-                Error.setData(new Model_Error("No results found for the query: " + query));
-                GlassPanePopup.showPopup(Error);
-                return null; // Or return a default GeoPosition if appropriate
-            }
-
-            JSONArray jsonArray = new JSONArray(body.trim());
-            if (jsonArray.length() == 0) {
-                System.out.println("No results found in the JSON array.");
-                return null; // Or return a default GeoPosition if appropriate
-            }
-
-            JSONObject json = jsonArray.getJSONObject(0); // Get the first result
-            double lat = json.getDouble("lat");
-            double lon = json.getDouble("lon");
-            return new GeoPosition(lat, lon);
-        } 
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        JSONArray jsonArray = new JSONArray(body.trim());
+        if (jsonArray.length() == 0) {
+            System.out.println("No results found in the JSON array.");
+            return null; // Or return a default GeoPosition if appropriate
         }
+
+        JSONObject json = jsonArray.getJSONObject(0); // Get the first result
+        double lat = json.getDouble("lat");
+        double lon = json.getDouble("lon");
+        return new GeoPosition(lat, lon);
+    } 
+    catch (Exception e) {
+        e.printStackTrace();
+        return null;
     }
+}
+
     
 
     public GeoPosition setLocationFrom(String name) throws JSONException {
@@ -331,17 +334,9 @@ public class Form_Map extends javax.swing.JPanel {
         initWaypoint();
     }
     
-    private void initWaypoint(List<GeoPosition> pathPoints) {
-        // Create a waypoint painter and set the waypoints
-        WaypointPainter<MyWaypoint> waypointPainter = new WaypointRender();
-        Set<MyWaypoint> waypointSet = new HashSet<>(waypoints);
-        waypointPainter.setWaypoints(waypointSet);
-    
+    private void initRoute(Graph graph, List<GeoPosition> pathPoints) {
         // Create a compound painter to combine multiple painters
         CompoundPainter<JXMapViewer> compoundPainter = new CompoundPainter<>();
-    
-        // Add the waypoint painter to the compound painter
-        compoundPainter.addPainter(waypointPainter);
     
         // Check if there are path points to draw a route
         if (pathPoints != null && !pathPoints.isEmpty()) {
@@ -350,19 +345,26 @@ public class Form_Map extends javax.swing.JPanel {
     
             // Add the RoutePainter to the compound painter
             compoundPainter.addPainter(routePainter);
+        } else {
+            // Calculate the shortest path if pathPoints are not provided
+            GeoPosition source = waypoints.get(0).getPosition();
+            GeoPosition destination = waypoints.get(waypoints.size() - 1).getPosition();
+            List<GeoPosition> shortestPath = Dijkstra.computeShortestPath(graph, source, destination);
+    
+            // Create a RoutePainter with the shortest path
+            RoutePainter routePainter = new RoutePainter(shortestPath);
+    
+            // Add the RoutePainter to the compound painter
+            compoundPainter.addPainter(routePainter);
         }
     
         // Set the compound painter as the overlay painter on the JXMapViewer
         jXMapViewer.setOverlayPainter(compoundPainter);
     
-        // Add buttons for each waypoint
-        for (MyWaypoint waypoint : waypoints) {
-            jXMapViewer.add(waypoint.getButton());
-        }
-    
         // Refresh the map viewer to display the new route
         jXMapViewer.repaint();
     }
+    
     
     private void initWaypoint() {
         // Create a waypoint painter and set the waypoints
@@ -376,12 +378,6 @@ public class Form_Map extends javax.swing.JPanel {
         // Add the waypoint painter to the compound painter
         compoundPainter.addPainter(waypointPainter);
     
-        // Create and populate the graph with your waypoints and the distances between them
-        Graph graph = new Graph();
-        populateGraphWithEdges(graph); // This method will add all the necessary edges to the graph
-    
-        // Check if there are exactly two waypoints to draw a route
-    
         // Set the compound painter as the overlay painter on the JXMapViewer
         jXMapViewer.setOverlayPainter(compoundPainter);
     
@@ -390,9 +386,10 @@ public class Form_Map extends javax.swing.JPanel {
             jXMapViewer.add(waypoint.getButton());
         }
     
-        // Refresh the map viewer to display the new route
+        // Refresh the map viewer to display the waypoints
         jXMapViewer.repaint();
     }
+    
 
     private void populateGraphWithEdges(Graph graph) {
         for (int i = 0; i < waypoints.size(); i++) {
