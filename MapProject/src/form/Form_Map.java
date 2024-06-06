@@ -3,6 +3,7 @@ package form;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -30,6 +31,10 @@ import org.jxmapviewer.viewer.WaypointPainter;
 
 import com.github.kevinsawicki.http.HttpRequest;
 
+import glasspanepopup.GlassPanePopup;
+import model.Model_Error;
+import model.Model_GraphHopper;
+import model.Model_RouteHopper;
 import paint.Dijkstra;
 import paint.Graph;
 import paint.RoutePainter;
@@ -41,11 +46,51 @@ public class Form_Map extends javax.swing.JPanel {
     private final List<MyWaypoint> waypoints = new ArrayList<>();
     private final WaypointPainter<MyWaypoint> waypointPainter = new WaypointRender();
     private EventWaypoint event;
+    private Model_GraphHopper graphHopper;
+    private Model_RouteHopper routeHopper;
+    private GeoPosition fromPosition = null;
+    private GeoPosition toPosition = null;
     public Form_Map() {
         initComponents();
         init();
         setupTextFields();
+        graphHopper = new Model_GraphHopper();
+        routeHopper = new Model_RouteHopper();
+    }
         
+    private void handleResponse(String response) {
+        // Handle the response here, for example, update the map with new waypoints
+        System.out.println(response);
+        
+        // Extract points from the response
+        List<List<GeoPosition>> allPaths = graphHopper.extractPoints(response);
+        
+        // Check if there are any paths
+        if (allPaths.isEmpty()) {
+            System.out.println("No paths found in the response.");
+            // Display a message or handle the absence of paths as needed
+        } else {
+            // Print out the points for each path
+            for (int i = 0; i < allPaths.size(); i++) {
+                List<GeoPosition> pathPoints = allPaths.get(i);
+                System.out.println("Path " + (i + 1) + " points:");
+                for (GeoPosition point : pathPoints) {
+                    System.out.println("Latitude: " + point.getLatitude() + ", Longitude: " + point.getLongitude());
+                    
+
+                }
+                initWaypoint(pathPoints);
+            }
+        }
+    }
+
+    private void showError(Exception e) {
+        // Show error message to the user
+        System.out.println(this + "Error: " + e.getMessage()+ "Error");
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        GlassPanePopup.showPopup(Error);
+        
+        Error.setData(new Model_Error(this + "Error: " + e.getMessage()+ "Error"));
     }
 
 
@@ -80,12 +125,13 @@ public class Form_Map extends javax.swing.JPanel {
         
         
     }
+    
     private void setupTextFields() {
         // Add key listener to txtFrom
         txtFrom.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-                    handleLocationInput(txtFrom.getText());
+                    handleLocationInput(txtFrom.getText(), true);
                 }
             }
         });
@@ -94,27 +140,92 @@ public class Form_Map extends javax.swing.JPanel {
         txtTo.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-                    handleLocationInput(txtTo.getText());
+                    handleLocationInput(txtTo.getText(), false);
                 }
             }
         });
     }
 
-    private void handleLocationInput(String locationName) {
-        try {
-            GeoPosition position = getLocationFromAPI(locationName);
-            System.out.println("Location: " + locationName);
-            System.out.println("Latitude: " + position.getLatitude() + ", Longitude: " + position.getLongitude());
+    private void updateTextFields() {
+        GeoPosition fromPosition = null;
+        GeoPosition toPosition = null;
 
-            // Create a new waypoint with the retrieved position
-            MyWaypoint newWaypoint = new MyWaypoint("New Waypoint", MyWaypoint.PointType.END, event, position);
+        if (waypoints.size() > 0) {
+            MyWaypoint firstWaypoint = waypoints.get(0);
+            String location = getLocation(firstWaypoint.getPosition());
+            txtFrom.setText(location);
+            fromPosition = firstWaypoint.getPosition();
+        } else {
+            txtFrom.setText("");
+        }
 
-            // Add the new waypoint
-            addWaypoint(newWaypoint);
-        } catch (JSONException e) {
-            System.err.println("Error retrieving location: " + e.getMessage());
+        if (waypoints.size() > 1) {
+            MyWaypoint secondWaypoint = waypoints.get(1);
+            String location = getLocation(secondWaypoint.getPosition());
+            txtTo.setText(location);
+            toPosition = secondWaypoint.getPosition();
+        } else {
+            txtTo.setText("");
+        }
+
+        if (fromPosition != null && toPosition != null) {
+            // Fetch the route information in a separate thread to avoid blocking the UI
+            GeoPosition finalFromPosition = fromPosition;
+            GeoPosition finalToPosition = toPosition;
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    String routeInfo = graphHopper.getRoute(finalFromPosition, finalToPosition);
+                    String routeCoor = routeHopper.getConnection(finalFromPosition, finalToPosition);
+                    System.out.println();
+                    handleResponse(routeInfo);
+                    System.out.println();
+                    handleResponse(routeCoor);
+                } catch (Exception e) {
+                    showError(e);
+                }
+            });
         }
     }
+
+    private void handleLocationInput(String locationName, boolean isFrom) {
+    try {
+        GeoPosition position = getLocationFromAPI(locationName);
+        System.out.println("Location: " + locationName);
+        System.out.println("Latitude: " + position.getLatitude() + ", Longitude: " + position.getLongitude());
+
+        if (isFrom) {
+            fromPosition = position;
+        } else {
+            toPosition = position;
+        }
+        // Create a new waypoint with the retrieved position
+        MyWaypoint newWaypoint = new MyWaypoint("New Waypoint", MyWaypoint.PointType.END, event, position);
+
+        // Add the new waypoint
+        addWaypoint(newWaypoint);
+
+        // If both from and to positions are set, fetch the route
+        if (fromPosition != null && toPosition != null) {
+            // Fetch the route information in a separate thread to avoid blocking the UI
+            new Thread(() -> {
+                try {
+                    String routeInfo = graphHopper.getRoute(fromPosition, toPosition);
+                    String routeCoor = routeHopper.getConnection(fromPosition, toPosition);
+                    SwingUtilities.invokeLater(() -> handleResponse(routeCoor));
+                    System.out.println();
+                    SwingUtilities.invokeLater(() -> handleResponse(routeInfo));
+                } catch (Exception e) {
+                    SwingUtilities.invokeLater(() -> showError(e));
+                }
+            }).start();
+        }
+    } catch (JSONException e) {
+        System.out.println("Error retrieving location: " + e.getMessage());
+    } catch (Exception e) {
+        showError(e);
+    }
+}
+    
     private void handleMapClick(GeoPosition position) {
         // Log and display the coordinates of the click
         System.out.println("Map clicked at: " + position.getLatitude() + ", " + position.getLongitude());
@@ -163,6 +274,8 @@ public class Form_Map extends javax.swing.JPanel {
             // Check if the response is an empty array
             if (body.trim().equals("[]")) {
                 System.out.println("No results found for the query: " + query);
+                Error.setData(new Model_Error("No results found for the query: " + query));
+                GlassPanePopup.showPopup(Error);
                 return null; // Or return a default GeoPosition if appropriate
             }
 
@@ -217,24 +330,40 @@ public class Form_Map extends javax.swing.JPanel {
         updateTextFields();
         initWaypoint();
     }
-    private void updateTextFields() {
-        if (waypoints.size() > 0) {
-            MyWaypoint firstWaypoint = waypoints.get(0);
-            String location = getLocation(firstWaypoint.getPosition());
-            txtFrom.setText(location);
-        } else {
-            txtFrom.setText("");
+    
+    private void initWaypoint(List<GeoPosition> pathPoints) {
+        // Create a waypoint painter and set the waypoints
+        WaypointPainter<MyWaypoint> waypointPainter = new WaypointRender();
+        Set<MyWaypoint> waypointSet = new HashSet<>(waypoints);
+        waypointPainter.setWaypoints(waypointSet);
+    
+        // Create a compound painter to combine multiple painters
+        CompoundPainter<JXMapViewer> compoundPainter = new CompoundPainter<>();
+    
+        // Add the waypoint painter to the compound painter
+        compoundPainter.addPainter(waypointPainter);
+    
+        // Check if there are path points to draw a route
+        if (pathPoints != null && !pathPoints.isEmpty()) {
+            // Create a RoutePainter with the path points
+            RoutePainter routePainter = new RoutePainter(pathPoints);
+    
+            // Add the RoutePainter to the compound painter
+            compoundPainter.addPainter(routePainter);
         }
     
-        if (waypoints.size() > 1) {
-            MyWaypoint secondWaypoint = waypoints.get(1);
-            String location = getLocation(secondWaypoint.getPosition());
-            txtTo.setText(location);
-        } else {
-            txtTo.setText("");
+        // Set the compound painter as the overlay painter on the JXMapViewer
+        jXMapViewer.setOverlayPainter(compoundPainter);
+    
+        // Add buttons for each waypoint
+        for (MyWaypoint waypoint : waypoints) {
+            jXMapViewer.add(waypoint.getButton());
         }
+    
+        // Refresh the map viewer to display the new route
+        jXMapViewer.repaint();
     }
-
+    
     private void initWaypoint() {
         // Create a waypoint painter and set the waypoints
         WaypointPainter<MyWaypoint> waypointPainter = new WaypointRender();
@@ -325,6 +454,7 @@ public class Form_Map extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        Error = new component.PanelError();
         jXMapViewer = new org.jxmapviewer.JXMapViewer();
         comboMapType = new combo_suggestion.ComboBoxSuggestion();
         jLabel1 = new javax.swing.JLabel();
@@ -418,6 +548,7 @@ public class Form_Map extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private component.PanelError Error;
     private combo_suggestion.ComboBoxSuggestion comboMapType;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

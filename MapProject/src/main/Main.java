@@ -4,12 +4,14 @@ import java.awt.*;
 
 import event.EventMenuSelected;
 import form.Form_Map;
+import glasspanepopup.GlassPanePopup;
 import swing.ScrollBar;
 import javax.swing.*;
 import java.util.*;
 public class Main extends javax.swing.JFrame {
     private Form_Map map;
     public Main() {
+        GlassPanePopup.install(this);
         initComponents();
         setBackground(new Color(0, 0, 0, 0));
         

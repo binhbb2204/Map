@@ -12,7 +12,9 @@
         "MapProject/src/org/http-request-6.0.jar",
         "MapProject/src/org/json-20230227.jar",
         "MapProject/src/org/graphhopper-core-5.3.jar",
-        "MapProject/src/org/graphhopper-web-api-5.3.jar"
+        "MapProject/src/org/graphhopper-web-api-5.3.jar",
+        "MapProject/src/org/okhttp-3.14.9-javadoc.jar",
+        "MapProject/src/org/okhttp-3.3.1-javadoc.jar"
     ],
     "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable"
 }
