@@ -381,20 +381,6 @@ public class Form_Map extends javax.swing.JPanel {
         populateGraphWithEdges(graph); // This method will add all the necessary edges to the graph
     
         // Check if there are exactly two waypoints to draw a route
-        if (waypoints.size() == 2) {
-            // Get the shortest path using Dijkstra's algorithm
-            List<GeoPosition> shortestPath = Dijkstra.computeShortestPath(
-                graph,
-                waypoints.get(0).getPosition(),
-                waypoints.get(1).getPosition()
-            );
-    
-            // If a path exists, create a route painter and add it to the compound painter
-            if (shortestPath != null && !shortestPath.isEmpty()) {
-                RoutePainter routePainter = new RoutePainter(shortestPath);
-                compoundPainter.addPainter(routePainter);
-            }
-        }
     
         // Set the compound painter as the overlay painter on the JXMapViewer
         jXMapViewer.setOverlayPainter(compoundPainter);
