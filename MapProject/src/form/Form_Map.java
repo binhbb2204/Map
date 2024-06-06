@@ -62,27 +62,18 @@ public class Form_Map extends javax.swing.JPanel {
         
     private void handleResponse(String response) {
         // Handle the response here, for example, update the map with new waypoints
-        System.out.println(response);
+        System.out.println("uhhh: "+response);
         
         // Extract points from the response
         List<List<GeoPosition>> allPaths = graphHopper.extractPoints(response);
         
-        // Check if there are any paths
-        if (allPaths.isEmpty()) {
-            System.out.println("No paths found in the response.");
-            // Display a message or handle the absence of paths as needed
-        } else {
-            // Print out the points for each path
-            for (int i = 0; i < allPaths.size(); i++) {
-                List<GeoPosition> pathPoints = allPaths.get(i);
-                System.out.println("Path " + (i + 1) + " points:");
-                for (GeoPosition point : pathPoints) {
-                    System.out.println("Latitude: " + point.getLatitude() + ", Longitude: " + point.getLongitude());
-                    
-
-                }
-                initRoute(graph, pathPoints);
+        for (int i = 0; i < allPaths.size(); i++) {
+            List<GeoPosition> pathPoints = allPaths.get(i);
+            System.out.println("Path " + (i + 1) + " points:");
+            for (GeoPosition point : pathPoints) {
+                System.out.println("Latitude: " + point.getLatitude() + ", Longitude: " + point.getLongitude());
             }
+            initRoute(graph, pathPoints);
         }
     }
 
@@ -102,7 +93,8 @@ public class Form_Map extends javax.swing.JPanel {
         jXMapViewer.setTileFactory(tileFactory);
         GeoPosition geo = new GeoPosition(10.8775848,106.7990447);
         jXMapViewer.setAddressLocation(geo);
-        jXMapViewer.setZoom(12);
+        jXMapViewer.setZoom(10);
+        
 
         MouseInputListener mm = new PanMouseInputListener(jXMapViewer);
         jXMapViewer.addMouseListener(mm);
@@ -124,6 +116,7 @@ public class Form_Map extends javax.swing.JPanel {
                 }
             }
         });
+        
         
         
     }
@@ -335,8 +328,16 @@ public class Form_Map extends javax.swing.JPanel {
     }
     
     private void initRoute(Graph graph, List<GeoPosition> pathPoints) {
+        // Create a waypoint painter and set the waypoints
+        WaypointPainter<MyWaypoint> waypointPainter = new WaypointRender();
+        Set<MyWaypoint> waypointSet = new HashSet<>(waypoints);
+        waypointPainter.setWaypoints(waypointSet);
+    
         // Create a compound painter to combine multiple painters
         CompoundPainter<JXMapViewer> compoundPainter = new CompoundPainter<>();
+    
+        // Add the waypoint painter to the compound painter
+        compoundPainter.addPainter(waypointPainter);
     
         // Check if there are path points to draw a route
         if (pathPoints != null && !pathPoints.isEmpty()) {
@@ -361,6 +362,11 @@ public class Form_Map extends javax.swing.JPanel {
         // Set the compound painter as the overlay painter on the JXMapViewer
         jXMapViewer.setOverlayPainter(compoundPainter);
     
+        // Add buttons for each waypoint
+        for (MyWaypoint waypoint : waypoints) {
+            jXMapViewer.add(waypoint.getButton());
+        }
+    
         // Refresh the map viewer to display the new route
         jXMapViewer.repaint();
     }
@@ -378,6 +384,12 @@ public class Form_Map extends javax.swing.JPanel {
         // Add the waypoint painter to the compound painter
         compoundPainter.addPainter(waypointPainter);
     
+        // Create and populate the graph with your waypoints and the distances between them
+        Graph graph = new Graph();
+        populateGraphWithEdges(graph); // This method will add all the necessary edges to the graph
+    
+        // Check if there are exactly two waypoints to draw a route
+    
         // Set the compound painter as the overlay painter on the JXMapViewer
         jXMapViewer.setOverlayPainter(compoundPainter);
     
@@ -386,7 +398,7 @@ public class Form_Map extends javax.swing.JPanel {
             jXMapViewer.add(waypoint.getButton());
         }
     
-        // Refresh the map viewer to display the waypoints
+        // Refresh the map viewer to display the new route
         jXMapViewer.repaint();
     }
     
