@@ -183,43 +183,47 @@ public class Form_Map extends javax.swing.JPanel {
     }
 
     private void handleLocationInput(String locationName, boolean isFrom) {
-    try {
-        GeoPosition position = getLocationFromAPI(locationName);
-        System.out.println("Location: " + locationName);
-        System.out.println("Latitude: " + position.getLatitude() + ", Longitude: " + position.getLongitude());
-
-        if (isFrom) {
-            fromPosition = position;
-        } else {
-            toPosition = position;
+        try {
+            GeoPosition position = getLocationFromAPI(locationName);
+            if (position == null) {
+                return; // Stop further execution if the location is not found
+            }
+    
+            System.out.println("Location: " + locationName);
+            System.out.println("Latitude: " + position.getLatitude() + ", Longitude: " + position.getLongitude());
+    
+            if (isFrom) {
+                fromPosition = position;
+            } else {
+                toPosition = position;
+            }
+            // Create a new waypoint with the retrieved position
+            MyWaypoint newWaypoint = new MyWaypoint("New Waypoint", MyWaypoint.PointType.END, event, position);
+    
+            // Add the new waypoint
+            addWaypoint(newWaypoint);
+    
+            // If both from and to positions are set, fetch the route
+            if (fromPosition != null && toPosition != null) {
+                // Fetch the route information in a separate thread to avoid blocking the UI
+                new Thread(() -> {
+                    try {
+                        String routeInfo = graphHopper.getRoute(fromPosition, toPosition);
+                        String routeCoor = routeHopper.getConnection(fromPosition, toPosition);
+                        SwingUtilities.invokeLater(() -> handleResponse(routeCoor));
+                        System.out.println();
+                        SwingUtilities.invokeLater(() -> handleResponse(routeInfo));
+                    } catch (Exception e) {
+                        SwingUtilities.invokeLater(() -> showError(e));
+                    }
+                }).start();
+            }
+        } catch (JSONException e) {
+            System.out.println("Error retrieving location: " + e.getMessage());
+        } catch (Exception e) {
+            showError(e);
         }
-        // Create a new waypoint with the retrieved position
-        MyWaypoint newWaypoint = new MyWaypoint("New Waypoint", MyWaypoint.PointType.END, event, position);
-
-        // Add the new waypoint
-        addWaypoint(newWaypoint);
-
-        // If both from and to positions are set, fetch the route
-        if (fromPosition != null && toPosition != null) {
-            // Fetch the route information in a separate thread to avoid blocking the UI
-            new Thread(() -> {
-                try {
-                    String routeInfo = graphHopper.getRoute(fromPosition, toPosition);
-                    String routeCoor = routeHopper.getConnection(fromPosition, toPosition);
-                    SwingUtilities.invokeLater(() -> handleResponse(routeCoor));
-                    System.out.println();
-                    SwingUtilities.invokeLater(() -> handleResponse(routeInfo));
-                } catch (Exception e) {
-                    SwingUtilities.invokeLater(() -> showError(e));
-                }
-            }).start();
-        }
-    } catch (JSONException e) {
-        System.out.println("Error retrieving location: " + e.getMessage());
-    } catch (Exception e) {
-        showError(e);
     }
-}
     
     private void handleMapClick(GeoPosition position) {
         // Log and display the coordinates of the click
