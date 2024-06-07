@@ -14,7 +14,15 @@ import org.json.JSONObject;
 import org.jxmapviewer.viewer.GeoPosition;
 
 public class Model_GraphHopper {
+    private int visitedNodesCount;
     private String apiKey = "6f0523e9-8519-431a-9f9b-01910e7616bd";
+    public Model_GraphHopper() {
+   
+    }
+    public Model_GraphHopper(String apiKey) {
+        this.apiKey = apiKey;
+        
+    }
 
     public String getRoute(GeoPosition start, GeoPosition end) throws Exception {
         String jsonPayload = createJsonPayload(start, end);
@@ -24,16 +32,23 @@ public class Model_GraphHopper {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonPayload, StandardCharsets.UTF_8))
                 .build();
-    
+
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int responseCode = response.statusCode();
         System.out.println("Response Code: " + responseCode);
         String responseBody = response.body();
-        
-        //System.out.println("Response Body: " + responseBody);
-    
+
+        // Update visited nodes count
+        visitedNodesCount = calculateVisitedNodesCount(responseBody);
+        System.out.println("Visited Nodes Count: " + visitedNodesCount);
+
+        // Print distance between points
+        double distance = calculateDistance(start, end);
+        System.out.println("Distance between points: " + distance + " km");
+
         return responseBody;
     }
+
     public List<List<GeoPosition>> extractPoints(String jsonResponse) {
         List<List<GeoPosition>> allPaths = new ArrayList<>();
 
@@ -109,5 +124,49 @@ public class Model_GraphHopper {
                 start.getLongitude(), start.getLatitude(),
                 end.getLongitude(), end.getLatitude()
         );
+    }
+
+    public int calculateVisitedNodesCount(String jsonResponse) {
+        int visitedNodesCount = 0;
+
+        try {
+            JSONObject jsonObject = new JSONObject(jsonResponse);
+
+            if (jsonObject.has("info")) {
+                JSONObject infoObject = jsonObject.getJSONObject("info");
+
+                if (infoObject.has("visited_nodes")) {
+                    visitedNodesCount = infoObject.getInt("visited_nodes");
+                }
+            }
+        } catch (JSONException e) {
+            System.err.println("Error parsing JSON response: " + e.getMessage());
+        }
+
+        return visitedNodesCount;
+    }
+
+    public int getVisitedNodesCount() {
+        return visitedNodesCount;
+    }
+
+    public double calculateDistance(GeoPosition start, GeoPosition end) {
+        // Calculate distance between two points (start and end)
+        double earthRadius = 6371.01; // Earth's radius in kilometers
+        double lat1 = Math.toRadians(start.getLatitude());
+        double lon1 = Math.toRadians(start.getLongitude());
+        double lat2 = Math.toRadians(end.getLatitude());
+        double lon2 = Math.toRadians(end.getLongitude());
+
+        double latDiff = lat2 - lat1;
+        double lonDiff = lon2 - lon1;
+
+        double a = Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
+                   Math.cos(lat1) * Math.cos(lat2) *
+                   Math.sin(lonDiff / 2) * Math.sin(lonDiff / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return earthRadius * c;
     }
 }

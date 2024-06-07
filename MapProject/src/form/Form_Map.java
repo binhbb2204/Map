@@ -6,10 +6,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -32,15 +29,9 @@ import org.jxmapviewer.viewer.WaypointPainter;
 import com.github.kevinsawicki.http.HttpRequest;
 
 import glasspanepopup.GlassPanePopup;
-import model.Model_Error;
-import model.Model_GraphHopper;
-import model.Model_RouteHopper;
-import paint.Dijkstra;
-import paint.Graph;
-import paint.RoutePainter;
-import waypoint.EventWaypoint;
-import waypoint.MyWaypoint;
-import waypoint.WaypointRender;
+import model.*;
+import paint.*;
+import waypoint.*;
 
 public class Form_Map extends javax.swing.JPanel {
     private final List<MyWaypoint> waypoints = new ArrayList<>();
@@ -51,6 +42,8 @@ public class Form_Map extends javax.swing.JPanel {
     private GeoPosition fromPosition = null;
     private GeoPosition toPosition = null;
     private Graph graph;
+    private DistanceCalculator distanceCal;
+    
     public Form_Map() {
         initComponents();
         init();
@@ -62,17 +55,26 @@ public class Form_Map extends javax.swing.JPanel {
         
     private void handleResponse(String response) {
         // Handle the response here, for example, update the map with new waypoints
-        System.out.println("uhhh: "+response);
-        
+        //System.out.println("uhhh: " + response);
+
         // Extract points from the response
         List<List<GeoPosition>> allPaths = graphHopper.extractPoints(response);
-        
+
         for (int i = 0; i < allPaths.size(); i++) {
             List<GeoPosition> pathPoints = allPaths.get(i);
-            System.out.println("Path " + (i + 1) + " points:");
+            //System.out.println("Path " + (i + 1) + " points:");
             for (GeoPosition point : pathPoints) {
-                System.out.println("Latitude: " + point.getLatitude() + ", Longitude: " + point.getLongitude());
+                //System.out.println("Latitude: " + point.getLatitude() + ", Longitude: " + point.getLongitude());
             }
+            // Print the distance between points
+            double distance = calculateTotalDistance(pathPoints);
+            System.out.printf("Distance between points: %.3f km%n", distance);
+
+            // Print the number of nodes visited
+            int visitedNodesCount = graphHopper.calculateVisitedNodesCount(response);
+            System.out.println("Visited Nodes Count: " + visitedNodesCount);
+
+            // Initialize route on the map
             initRoute(graph, pathPoints);
         }
     }
@@ -86,7 +88,6 @@ public class Form_Map extends javax.swing.JPanel {
         Error.setData(new Model_Error(this + "Error: " + e.getMessage()+ "Error"));
     }
 
-
     public void init(){
         TileFactoryInfo info = new OSMTileFactoryInfo();
         DefaultTileFactory tileFactory = new DefaultTileFactory(info);
@@ -95,7 +96,6 @@ public class Form_Map extends javax.swing.JPanel {
         jXMapViewer.setAddressLocation(geo);
         jXMapViewer.setZoom(10);
         
-
         MouseInputListener mm = new PanMouseInputListener(jXMapViewer);
         jXMapViewer.addMouseListener(mm);
         jXMapViewer.addMouseMotionListener(mm);
@@ -116,9 +116,6 @@ public class Form_Map extends javax.swing.JPanel {
                 }
             }
         });
-        
-        
-        
     }
     
     private void setupTextFields() {
@@ -188,10 +185,10 @@ public class Form_Map extends javax.swing.JPanel {
             if (position == null) {
                 return; // Stop further execution if the location is not found
             }
-    
+
             System.out.println("Location: " + locationName);
             System.out.println("Latitude: " + position.getLatitude() + ", Longitude: " + position.getLongitude());
-    
+
             if (isFrom) {
                 fromPosition = position;
             } else {
@@ -199,10 +196,10 @@ public class Form_Map extends javax.swing.JPanel {
             }
             // Create a new waypoint with the retrieved position
             MyWaypoint newWaypoint = new MyWaypoint("New Waypoint", MyWaypoint.PointType.END, event, position);
-    
+
             // Add the new waypoint
             addWaypoint(newWaypoint);
-    
+
             // If both from and to positions are set, fetch the route
             if (fromPosition != null && toPosition != null) {
                 // Fetch the route information in a separate thread to avoid blocking the UI
@@ -213,6 +210,13 @@ public class Form_Map extends javax.swing.JPanel {
                         SwingUtilities.invokeLater(() -> handleResponse(routeCoor));
                         System.out.println();
                         SwingUtilities.invokeLater(() -> handleResponse(routeInfo));
+
+                        // Calculate and print the distance between the two points
+                        double distance = graphHopper.calculateDistance(fromPosition, toPosition);
+//                        System.out.printf("Distance between points: %.3f km%n", distance);
+
+                        // Print the number of nodes visited
+                        System.out.println("Number of nodes visited: " + graphHopper.getVisitedNodesCount());
                     } catch (Exception e) {
                         SwingUtilities.invokeLater(() -> showError(e));
                     }
@@ -225,7 +229,7 @@ public class Form_Map extends javax.swing.JPanel {
         }
     }
     
-    private void handleMapClick(GeoPosition position) {
+   private void handleMapClick(GeoPosition position) {
         // Log and display the coordinates of the click
         System.out.println("Map clicked at: " + position.getLatitude() + ", " + position.getLongitude());
 
@@ -235,15 +239,20 @@ public class Form_Map extends javax.swing.JPanel {
             System.out.println("Location: " + location);
             int id = getOSM_ID(position);
             System.out.println(id);
-
         } 
         catch (JSONException e) {
             System.err.println("Failed to parse JSON response: " + e.getMessage());
         } 
-        
+
         // Add a waypoint at the clicked position
         MyWaypoint newWaypoint = new MyWaypoint("New Waypoint", MyWaypoint.PointType.END, event, position);
         addWaypoint(newWaypoint);
+
+        // Print distance if both fromPosition and toPosition are set
+        if (fromPosition != null && toPosition != null) {
+            double distance =  graphHopper.calculateDistance(fromPosition, toPosition);
+            System.out.println("Distance between points: " + distance + " km");
+        }
     }
     
     public String getLocation(GeoPosition pos) throws JSONException{
@@ -251,52 +260,52 @@ public class Form_Map extends javax.swing.JPanel {
         JSONObject json = new JSONObject(body);
         return json.getString("display_name");
     }
+    
     public int getOSM_ID(GeoPosition pos) throws JSONException{
         String body = HttpRequest.get("https://nominatim.openstreetmap.org/reverse?lat=" + pos.getLatitude() + "&lon=" + pos.getLongitude() + "&format=json").body();
         JSONObject json = new JSONObject(body);
         return json.getInt("osm_id");
     }
+   
     private GeoPosition getLocationFromAPI(String query) throws JSONException {
-    if (query == null || query.trim().isEmpty()) {
-        System.out.println("Query is empty or null.");
-        return null; // Or return a default GeoPosition if appropriate
-    }
-
-    try {
-        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
-        String url = "https://nominatim.openstreetmap.org/search?q=" + encodedQuery + "&format=json";
-        System.out.println("API URL: " + url); // Print the full API URL for debugging
-
-        String body = HttpRequest.get(url).body();
-        System.out.println("Raw JSON response: " + body);
-
-        // Check if the response is an empty array
-        if (body.trim().equals("[]")) {
-            System.out.println("No results found for the query: " + query);
-            Error.setData(new Model_Error("No results found for the query: " + query));
-            GlassPanePopup.showPopup(Error);
+        if (query == null || query.trim().isEmpty()) {
+            System.out.println("Query is empty or null.");
             return null; // Or return a default GeoPosition if appropriate
         }
 
-        JSONArray jsonArray = new JSONArray(body.trim());
-        if (jsonArray.length() == 0) {
-            System.out.println("No results found in the JSON array.");
-            return null; // Or return a default GeoPosition if appropriate
+        try {
+            String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
+            String url = "https://nominatim.openstreetmap.org/search?q=" + encodedQuery + "&format=json";
+            System.out.println("API URL: " + url); // Print the full API URL for debugging
+
+            String body = HttpRequest.get(url).body();
+            System.out.println("Raw JSON response: " + body);
+
+            // Check if the response is an empty array
+            if (body.trim().equals("[]")) {
+                System.out.println("No results found for the query: " + query);
+                Error.setData(new Model_Error("No results found for the query: " + query));
+                GlassPanePopup.showPopup(Error);
+                return null; // Or return a default GeoPosition if appropriate
+            }
+
+            JSONArray jsonArray = new JSONArray(body.trim());
+            if (jsonArray.length() == 0) {
+                System.out.println("No results found in the JSON array.");
+                return null; // Or return a default GeoPosition if appropriate
+            }
+
+            JSONObject json = jsonArray.getJSONObject(0); // Get the first result
+            double lat = json.getDouble("lat");
+            double lon = json.getDouble("lon");
+            return new GeoPosition(lat, lon);
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-
-        JSONObject json = jsonArray.getJSONObject(0); // Get the first result
-        double lat = json.getDouble("lat");
-        double lon = json.getDouble("lon");
-        return new GeoPosition(lat, lon);
-    } 
-    catch (Exception e) {
-        e.printStackTrace();
-        return null;
-    }
-}
-
+    }     
     
-
     public GeoPosition setLocationFrom(String name) throws JSONException {
         return getLocationFromAPI(txtFrom.getText());
     }
@@ -352,15 +361,17 @@ public class Form_Map extends javax.swing.JPanel {
             compoundPainter.addPainter(routePainter);
         } else {
             // Calculate the shortest path if pathPoints are not provided
-            GeoPosition source = waypoints.get(0).getPosition();
-            GeoPosition destination = waypoints.get(waypoints.size() - 1).getPosition();
-            List<GeoPosition> shortestPath = Dijkstra.computeShortestPath(graph, source, destination);
-    
+            GeoPosition start = waypoints.get(0).getPosition();
+            GeoPosition end = waypoints.get(waypoints.size() - 1).getPosition();
+            //List<GeoPosition> shortestPath = Dijkstra.computeShortestPath(graph, start, end);
+            List<GeoPosition> shortestPath = AStar.computeShortestPath(graph, start, end);
             // Create a RoutePainter with the shortest path
             RoutePainter routePainter = new RoutePainter(shortestPath);
     
             // Add the RoutePainter to the compound painter
             compoundPainter.addPainter(routePainter);
+            System.out.println(distanceCal.calculateDistance(start,end));
+
         }
     
         // Set the compound painter as the overlay painter on the JXMapViewer
@@ -370,12 +381,10 @@ public class Form_Map extends javax.swing.JPanel {
         for (MyWaypoint waypoint : waypoints) {
             jXMapViewer.add(waypoint.getButton());
         }
-    
         // Refresh the map viewer to display the new route
         jXMapViewer.repaint();
     }
-    
-    
+       
     private void initWaypoint() {
         // Create a waypoint painter and set the waypoints
         WaypointPainter<MyWaypoint> waypointPainter = new WaypointRender();
@@ -406,25 +415,24 @@ public class Form_Map extends javax.swing.JPanel {
         jXMapViewer.repaint();
     }
     
-
     private void populateGraphWithEdges(Graph graph) {
         for (int i = 0; i < waypoints.size(); i++) {
             for (int j = i + 1; j < waypoints.size(); j++) {
-                double distance = calculateDistance(waypoints.get(i).getPosition(), waypoints.get(j).getPosition());
+                double distance = graphHopper.calculateDistance(waypoints.get(i).getPosition(), waypoints.get(j).getPosition());
                 graph.addEdge(waypoints.get(i).getPosition(), waypoints.get(j).getPosition(), distance);
                 graph.addEdge(waypoints.get(j).getPosition(), waypoints.get(i).getPosition(), distance);
             }
         }
     }
-    private double calculateDistance(GeoPosition pos1, GeoPosition pos2) {
-        double earthRadius = 6371.01; // Earth's radius in kilometers
-        double latDiff = Math.toRadians(pos2.getLatitude() - pos1.getLatitude());
-        double lonDiff = Math.toRadians(pos2.getLongitude() - pos1.getLongitude());
-        double a = Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
-                   Math.cos(Math.toRadians(pos1.getLatitude())) * Math.cos(Math.toRadians(pos2.getLatitude())) *
-                   Math.sin(lonDiff / 2) * Math.sin(lonDiff / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return earthRadius * c;
+    
+    private double calculateTotalDistance(List<GeoPosition> pathPoints) {
+        double totalDistance = 0;
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            GeoPosition currentPoint = pathPoints.get(i);
+            GeoPosition nextPoint = pathPoints.get(i + 1);
+            totalDistance += graphHopper.calculateDistance(currentPoint, nextPoint);
+        }
+        return totalDistance;
     }
 
     private void clearWaypoint() {

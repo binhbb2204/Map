@@ -6,7 +6,7 @@ public class DistanceCalculator {
     private static final double EARTH_RADIUS = 6371; // in kilometers
 
     // Calculate distance between two GeoPositions using the Haversine formula
-    public static double calculateDistance(GeoPosition pos1, GeoPosition pos2) {
+    public double calculateDistance(GeoPosition pos1, GeoPosition pos2) {
         if (pos1.equals(pos2)) {
             // If the positions are the same, return 0.0
             return 0.0;
