@@ -24,8 +24,8 @@ public class RoutePainter implements Painter<JXMapViewer> {
         g.translate(-rect.x, -rect.y);
 
         // Do the drawing
-        g.setColor(new Color(255, 0, 0, 128));
-        g.setStroke(new BasicStroke(6));
+        g.setColor(new Color(0, 150, 255, 128));
+        g.setStroke(new BasicStroke(8));
 
         Point2D lastPoint = null;
         for (GeoPosition gp : track) {
