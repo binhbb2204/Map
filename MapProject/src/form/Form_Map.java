@@ -54,27 +54,15 @@ public class Form_Map extends javax.swing.JPanel {
     }
         
     private void handleResponse(String response) {
-        // Handle the response here, for example, update the map with new waypoints
-        //System.out.println("uhhh: " + response);
-
-        // Extract points from the response
         List<List<GeoPosition>> allPaths = graphHopper.extractPoints(response);
 
-        for (int i = 0; i < allPaths.size(); i++) {
-            List<GeoPosition> pathPoints = allPaths.get(i);
-            //System.out.println("Path " + (i + 1) + " points:");
-            for (GeoPosition point : pathPoints) {
-                //System.out.println("Latitude: " + point.getLatitude() + ", Longitude: " + point.getLongitude());
-            }
-            // Print the distance between points
+        for (List<GeoPosition> pathPoints : allPaths) {
             double distance = calculateTotalDistance(pathPoints);
             System.out.printf("Distance between points: %.3f km%n", distance);
 
-            // Print the number of nodes visited
             int visitedNodesCount = graphHopper.calculateVisitedNodesCount(response);
             System.out.println("Visited Nodes Count: " + visitedNodesCount);
 
-            // Initialize route on the map
             initRoute(graph, pathPoints);
         }
     }
@@ -249,10 +237,10 @@ public class Form_Map extends javax.swing.JPanel {
         addWaypoint(newWaypoint);
 
         // Print distance if both fromPosition and toPosition are set
-        if (fromPosition != null && toPosition != null) {
-            double distance =  graphHopper.calculateDistance(fromPosition, toPosition);
-            System.out.println("Distance between points: " + distance + " km");
-        }
+        // if (fromPosition != null && toPosition != null) {
+        //     double distance =  graphHopper.calculateDistance(fromPosition, toPosition);
+        //     System.out.println("Distance between points: " + distance + " km");
+        // }
     }
     
     public String getLocation(GeoPosition pos) throws JSONException{
@@ -370,7 +358,7 @@ public class Form_Map extends javax.swing.JPanel {
     
             // Add the RoutePainter to the compound painter
             compoundPainter.addPainter(routePainter);
-            System.out.println(distanceCal.calculateDistance(start,end));
+            //System.out.println(distanceCal.calculateDistance(start,end));
 
         }
     

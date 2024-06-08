@@ -6,13 +6,23 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 public class RoutePainter implements Painter<JXMapViewer> {
     private final List<GeoPosition> track;
+    private BufferedImage pinImage;
 
     public RoutePainter(List<GeoPosition> track) {
         this.track = track;
+        try {
+            pinImage = ImageIO.read(getClass().getResource("/icons/pin.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -34,6 +44,12 @@ public class RoutePainter implements Painter<JXMapViewer> {
             //System.out.println("GeoPosition in track: " + gp);
             if (lastPoint != null) {
                 g.drawLine((int) lastPoint.getX(), (int) lastPoint.getY(), (int) point.getX(), (int) point.getY());
+            }
+            int index = track.indexOf(gp);
+            if (index % 5 == 0 && pinImage != null) {
+                int pinX = (int) point.getX() - pinImage.getWidth() / 2;
+                int pinY = (int) point.getY() - pinImage.getHeight();
+                g.drawImage(pinImage, pinX, pinY, null);
             }
 
             lastPoint = point;

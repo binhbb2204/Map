@@ -43,8 +43,8 @@ public class Model_GraphHopper {
         System.out.println("Visited Nodes Count: " + visitedNodesCount);
 
         // Print distance between points
-        double distance = calculateDistance(start, end);
-        System.out.println("Distance between points: " + distance + " km");
+        // double distance = calculateDistance(start, end);
+        // System.out.println("Distance between points: " + distance + " km");
 
         return responseBody;
     }
@@ -127,23 +127,29 @@ public class Model_GraphHopper {
     }
 
     public int calculateVisitedNodesCount(String jsonResponse) {
-        int visitedNodesCount = 0;
+        int totalCoordinates = 0;
 
         try {
             JSONObject jsonObject = new JSONObject(jsonResponse);
 
-            if (jsonObject.has("info")) {
-                JSONObject infoObject = jsonObject.getJSONObject("info");
+            if (jsonObject.has("paths")) {
+                JSONArray pathsArray = jsonObject.getJSONArray("paths");
 
-                if (infoObject.has("visited_nodes")) {
-                    visitedNodesCount = infoObject.getInt("visited_nodes");
+                for (int i = 0; i < pathsArray.length(); i++) {
+                    JSONObject pathObject = pathsArray.getJSONObject(i);
+
+                    if (pathObject.has("points")) {
+                        String pointsString = pathObject.getString("points");
+                        List<GeoPosition> pathPoints = parsePolyline(pointsString);
+                        totalCoordinates += pathPoints.size();
+                    }
                 }
             }
         } catch (JSONException e) {
             System.err.println("Error parsing JSON response: " + e.getMessage());
         }
 
-        return visitedNodesCount;
+        return totalCoordinates;
     }
 
     public int getVisitedNodesCount() {
