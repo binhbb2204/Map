@@ -450,12 +450,16 @@ public class Form_Map extends javax.swing.JPanel {
     private void initComponents() {
 
         Error = new component.PanelError();
+        jComboBox1 = new javax.swing.JComboBox<>();
         jXMapViewer = new org.jxmapviewer.JXMapViewer();
         comboMapType = new combo_suggestion.ComboBoxSuggestion();
         jLabel1 = new javax.swing.JLabel();
         txtFrom = new swing.MyTextField();
         jLabel2 = new javax.swing.JLabel();
         txtTo = new swing.MyTextField();
+        comboAlgorithmType = new combo_suggestion.ComboBoxSuggestion();
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         comboMapType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Open Street", "Virtual Earth", "Hybrid", "Statelite" }));
         comboMapType.addActionListener(new java.awt.event.ActionListener() {
@@ -471,6 +475,13 @@ public class Form_Map extends javax.swing.JPanel {
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel2.setText("To");
 
+        comboAlgorithmType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Dijkstra ", "A*", "DFS" }));
+        comboAlgorithmType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboAlgorithmTypeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jXMapViewerLayout = new javax.swing.GroupLayout(jXMapViewer);
         jXMapViewer.setLayout(jXMapViewerLayout);
         jXMapViewerLayout.setHorizontalGroup(
@@ -485,7 +496,9 @@ public class Form_Map extends javax.swing.JPanel {
                     .addComponent(txtTo, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 300, Short.MAX_VALUE)
-                .addComponent(comboMapType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(comboMapType, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(comboAlgorithmType, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jXMapViewerLayout.setVerticalGroup(
@@ -499,7 +512,9 @@ public class Form_Map extends javax.swing.JPanel {
                     .addComponent(comboMapType, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
                 .addGroup(jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jXMapViewerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(comboAlgorithmType, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(389, 389, 389))
         );
@@ -541,10 +556,16 @@ public class Form_Map extends javax.swing.JPanel {
         jXMapViewer.setTileFactory(tileFactory);
     }//GEN-LAST:event_comboMapTypeActionPerformed
 
+    private void comboAlgorithmTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboAlgorithmTypeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboAlgorithmTypeActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private component.PanelError Error;
+    private combo_suggestion.ComboBoxSuggestion comboAlgorithmType;
     private combo_suggestion.ComboBoxSuggestion comboMapType;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private org.jxmapviewer.JXMapViewer jXMapViewer;
