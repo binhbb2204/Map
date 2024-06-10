@@ -1,7 +1,4 @@
-
 package model;
-
-
 public class Model_Error {
     String title;
 

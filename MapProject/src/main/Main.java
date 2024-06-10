@@ -1,7 +1,6 @@
-
 package main;
-import java.awt.*;
 
+import java.awt.*;
 import event.EventMenuSelected;
 import form.Form_Map;
 import glasspanepopup.GlassPanePopup;

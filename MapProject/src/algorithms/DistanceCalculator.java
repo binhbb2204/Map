@@ -1,4 +1,4 @@
-package paint;
+package algorithms;
 import org.jxmapviewer.viewer.GeoPosition;
 
 public class DistanceCalculator {

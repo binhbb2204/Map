@@ -21,7 +21,6 @@ public class Model_GraphHopper {
     }
     public Model_GraphHopper(String apiKey) {
         this.apiKey = apiKey;
-        
     }
 
     public String getRoute(GeoPosition start, GeoPosition end) throws Exception {
@@ -38,13 +37,13 @@ public class Model_GraphHopper {
         System.out.println("Response Code: " + responseCode);
         String responseBody = response.body();
 
+        // Determine routing mode
+        String routingMode = "Flexible Mode"; // Since ch.disable=true & lm.disable=true
+        System.out.println("Routing Mode: " + routingMode);
+        
         // Update visited nodes count
         visitedNodesCount = calculateVisitedNodesCount(responseBody);
         System.out.println("Visited Nodes Count: " + visitedNodesCount);
-
-        // Print distance between points
-        // double distance = calculateDistance(start, end);
-        // System.out.println("Distance between points: " + distance + " km");
 
         return responseBody;
     }
@@ -120,11 +119,17 @@ public class Model_GraphHopper {
 
     private String createJsonPayload(GeoPosition start, GeoPosition end) {
         return String.format(
-                "{\"profile\":\"car\",\"points\":[[%f,%f],[%f,%f]],\"snap_preventions\":[\"motorway\",\"ferry\",\"tunnel\"],\"details\":[\"road_class\",\"surface\"]}",
-                start.getLongitude(), start.getLatitude(),
-                end.getLongitude(), end.getLatitude()
+            "{"
+            + "\"profile\":\"car\","
+            + "\"points\":[[%f,%f],[%f,%f]],"
+            + "\"snap_preventions\":[\"motorway\",\"ferry\",\"tunnel\"],"
+            + "\"details\":[\"road_class\",\"surface\"]"
+            + "}",
+            start.getLongitude(), start.getLatitude(),
+            end.getLongitude(), end.getLatitude()
         );
     }
+    
 
     public int calculateVisitedNodesCount(String jsonResponse) {
         int totalCoordinates = 0;
