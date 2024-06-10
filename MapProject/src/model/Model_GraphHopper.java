@@ -123,7 +123,8 @@ public class Model_GraphHopper {
             + "\"profile\":\"car\","
             + "\"points\":[[%f,%f],[%f,%f]],"
             + "\"snap_preventions\":[\"motorway\",\"ferry\",\"tunnel\"],"
-            + "\"details\":[\"road_class\",\"surface\"]"
+            + "\"details\":[\"road_class\",\"surface\"],"
+            + "\"ch.disable\": true"
             + "}",
             start.getLongitude(), start.getLatitude(),
             end.getLongitude(), end.getLatitude()

@@ -29,6 +29,8 @@ import org.jxmapviewer.viewer.WaypointPainter;
 
 import com.github.kevinsawicki.http.HttpRequest;
 
+import algorithms.AStar;
+import algorithms.Dijkstra;
 import glasspanepopup.GlassPanePopup;
 import model.*;
 import paint.*;
@@ -360,6 +362,30 @@ public class Form_Map extends javax.swing.JPanel {
             // Add the RoutePainter to the compound painter
             //compoundPainter.addPainter(routePainter);
             //System.out.println(distanceCal.calculateDistance(start,end));
+            List<GeoPosition> shortestPath = new ArrayList<>();
+
+            int index = getIndex();
+            System.out.println("Selected Index: " + index);
+            switch (index) {
+                case 0:
+                    shortestPath = Dijkstra.computeShortestPath(graph, start, end);
+                    System.out.println("Choose Dijkstra");
+                    break;
+                case 1:
+                    shortestPath = AStar.computeShortestPath(graph, start, end);
+                    System.out.println("Choose A*");
+                    break;
+                case 2:
+                    //shortestPath = DFS.computeShortestPath(graph, start, end);
+                    System.out.println("Choose DFS");
+                    break;
+                default:
+                    System.err.println("Unknown algorithm selected.");
+                    return;
+            }
+            RoutePainter routePainter = new RoutePainter(shortestPath);
+            // Add the RoutePainter to the compound painter
+            compoundPainter.addPainter(routePainter);
 
         }
     
@@ -451,7 +477,7 @@ public class Form_Map extends javax.swing.JPanel {
     private void initComponents() {
 
         Error = new component.PanelError();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jXMapViewer = new org.jxmapviewer.JXMapViewer();
         comboMapType = new combo_suggestion.ComboBoxSuggestion();
         jLabel1 = new javax.swing.JLabel();
@@ -459,8 +485,13 @@ public class Form_Map extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         txtTo = new swing.MyTextField();
         comboAlgorithmType = new combo_suggestion.ComboBoxSuggestion();
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        panelBorder1 = new swing.PanelBorder();
+        walkingOption = new radio_button.RadioButton();
+        carOption = new radio_button.RadioButton();
+        truckOption = new radio_button.RadioButton();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
 
         comboMapType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Open Street", "Virtual Earth", "Hybrid", "Statelite" }));
         comboMapType.addActionListener(new java.awt.event.ActionListener() {
@@ -517,7 +548,66 @@ public class Form_Map extends javax.swing.JPanel {
                         .addComponent(txtTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(comboAlgorithmType, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(389, 389, 389))
+                .addContainerGap(296, Short.MAX_VALUE))
+        );
+
+        panelBorder1.setBackground(new java.awt.Color(255, 255, 255));
+
+        buttonGroup1.add(walkingOption);
+        walkingOption.setForeground(new java.awt.Color(127, 127, 127));
+        walkingOption.setText("Walking");
+        walkingOption.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+
+        carOption.setBackground(new java.awt.Color(0, 255, 51));
+        buttonGroup1.add(carOption);
+        carOption.setForeground(new java.awt.Color(127, 127, 127));
+        carOption.setText("Car");
+        carOption.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+
+        truckOption.setBackground(new java.awt.Color(255, 51, 51));
+        buttonGroup1.add(truckOption);
+        truckOption.setForeground(new java.awt.Color(127, 127, 127));
+        truckOption.setText("Truck");
+        truckOption.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/walking (1).png"))); // NOI18N
+
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/car.png"))); // NOI18N
+
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/cargo-truck.png"))); // NOI18N
+
+        javax.swing.GroupLayout panelBorder1Layout = new javax.swing.GroupLayout(panelBorder1);
+        panelBorder1.setLayout(panelBorder1Layout);
+        panelBorder1Layout.setHorizontalGroup(
+            panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelBorder1Layout.createSequentialGroup()
+                .addGap(43, 43, 43)
+                .addComponent(walkingOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel3)
+                .addGap(70, 70, 70)
+                .addComponent(carOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4)
+                .addGap(70, 70, 70)
+                .addComponent(truckOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panelBorder1Layout.setVerticalGroup(
+            panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelBorder1Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(walkingOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(carOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(truckOption, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -526,7 +616,9 @@ public class Form_Map extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jXMapViewer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jXMapViewer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelBorder1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -534,6 +626,8 @@ public class Form_Map extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jXMapViewer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(5, 5, 5)
+                .addComponent(panelBorder1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -557,20 +651,34 @@ public class Form_Map extends javax.swing.JPanel {
         jXMapViewer.setTileFactory(tileFactory);
     }//GEN-LAST:event_comboMapTypeActionPerformed
 
+    int index = 0;
     private void comboAlgorithmTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboAlgorithmTypeActionPerformed
-        // TODO add your handling code here:
+        index = comboAlgorithmType.getSelectedIndex();
+        // Just to see which algorithm is selected
+        System.out.println("Selected Algorithm Index: " + index);
+
     }//GEN-LAST:event_comboAlgorithmTypeActionPerformed
+    private int getIndex(){
+        return index;
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private component.PanelError Error;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private radio_button.RadioButton carOption;
     private combo_suggestion.ComboBoxSuggestion comboAlgorithmType;
     private combo_suggestion.ComboBoxSuggestion comboMapType;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private org.jxmapviewer.JXMapViewer jXMapViewer;
+    private swing.PanelBorder panelBorder1;
+    private radio_button.RadioButton truckOption;
     private swing.MyTextField txtFrom;
     private swing.MyTextField txtTo;
+    private radio_button.RadioButton walkingOption;
     // End of variables declaration//GEN-END:variables
 }
