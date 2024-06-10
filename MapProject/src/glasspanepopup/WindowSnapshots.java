@@ -1,4 +1,3 @@
-
 package glasspanepopup;
 
 import java.awt.Graphics;
@@ -6,12 +5,9 @@ import java.awt.image.VolatileImage;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
-
-
 public class WindowSnapshots {
 
     private final JFrame frame;
-
     private JComponent snapshotLayer;
     private boolean inShowSnapshot;
 

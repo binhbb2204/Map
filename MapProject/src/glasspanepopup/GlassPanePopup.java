@@ -1,6 +1,4 @@
-
 package glasspanepopup;
-
 
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -11,19 +9,15 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.SwingUtilities;
-
-
 public class GlassPanePopup {
-    
-
-    protected JLayeredPane getLayerPane() {
-        return layerPane;
-    }
-
     private static GlassPanePopup instance;
     private JLayeredPane layerPane;
     protected WindowSnapshots windowSnapshots;
     protected Container contentPane;
+
+    protected JLayeredPane getLayerPane() {
+        return layerPane;
+    }
 
     private GlassPanePopup() {
         init();
@@ -39,12 +33,15 @@ public class GlassPanePopup {
         if (name != null) {
             popup.setName(name);
         }
+
         layerPane.add(popup, 0);
         popup.setVisible(true);
         popup.setShowPopup(true);
+
         if (!layerPane.isVisible()) {
             layerPane.setVisible(true);
         }
+        
         layerPane.grabFocus();
     }
 

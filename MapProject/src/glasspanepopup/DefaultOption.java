@@ -1,10 +1,7 @@
-
 package glasspanepopup;
 
 import java.awt.Color;
 import java.awt.Component;
-
-
 public class DefaultOption implements Option {
 
     private float animate;

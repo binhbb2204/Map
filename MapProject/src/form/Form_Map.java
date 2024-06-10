@@ -1,6 +1,7 @@
-
 package form;
 
+//import algorithms.DistanceCalculator;
+//import algorithms.AStar;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class Form_Map extends javax.swing.JPanel {
     private GeoPosition fromPosition = null;
     private GeoPosition toPosition = null;
     private Graph graph;
-    private DistanceCalculator distanceCal;
+    //private DistanceCalculator distanceCal;
     
     public Form_Map() {
         initComponents();
@@ -130,7 +131,7 @@ public class Form_Map extends javax.swing.JPanel {
         GeoPosition fromPosition = null;
         GeoPosition toPosition = null;
 
-        if (waypoints.size() > 0) {
+        if (!waypoints.isEmpty()) {
             MyWaypoint firstWaypoint = waypoints.get(0);
             String location = getLocation(firstWaypoint.getPosition());
             txtFrom.setText(location);
@@ -352,12 +353,12 @@ public class Form_Map extends javax.swing.JPanel {
             GeoPosition start = waypoints.get(0).getPosition();
             GeoPosition end = waypoints.get(waypoints.size() - 1).getPosition();
             //List<GeoPosition> shortestPath = Dijkstra.computeShortestPath(graph, start, end);
-            List<GeoPosition> shortestPath = AStar.computeShortestPath(graph, start, end);
+            //List<GeoPosition> shortestPath = AStar.computeShortestPath(graph, start, end);
             // Create a RoutePainter with the shortest path
-            RoutePainter routePainter = new RoutePainter(shortestPath);
+            //RoutePainter routePainter = new RoutePainter(shortestPath);
     
             // Add the RoutePainter to the compound painter
-            compoundPainter.addPainter(routePainter);
+            //compoundPainter.addPainter(routePainter);
             //System.out.println(distanceCal.calculateDistance(start,end));
 
         }

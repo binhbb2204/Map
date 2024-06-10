@@ -1,6 +1,4 @@
-
 package glasspanepopup;
-
 
 import java.awt.AlphaComposite;
 import java.awt.Component;
@@ -16,8 +14,6 @@ import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTargetAdapter;
-
-
 public class Popup extends JComponent {
 
     private final GlassPanePopup parent;

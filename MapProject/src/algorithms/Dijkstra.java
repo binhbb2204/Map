@@ -1,8 +1,9 @@
-package paint;
+package algorithms;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
 import java.util.*;
+import paint.Graph;
 
 public class Dijkstra {
     public static List<GeoPosition> computeShortestPath(Graph graph, GeoPosition source, GeoPosition destination) {

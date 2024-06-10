@@ -1,11 +1,7 @@
-
 package glasspanepopup;
-
 
 import java.awt.Color;
 import java.awt.Component;
-
-
 public interface Option {
 
     public String getLayout(Component parent, float animate);
