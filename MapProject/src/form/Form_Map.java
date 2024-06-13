@@ -58,6 +58,7 @@ public class Form_Map extends javax.swing.JPanel {
         graphHopper = new Model_GraphHopper();
         routeHopper = new Model_RouteHopper();
         graph = new Graph();
+        carOption.setSelected(true);
     }
     private void setupRadioButtons() {
         walkingOption.addActionListener(new ActionListener() {
