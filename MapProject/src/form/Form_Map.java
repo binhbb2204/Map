@@ -1,5 +1,7 @@
 package form;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 //import algorithms.DistanceCalculator;
 //import algorithms.AStar;
 import java.awt.event.MouseAdapter;
@@ -45,15 +47,38 @@ public class Form_Map extends javax.swing.JPanel {
     private GeoPosition fromPosition = null;
     private GeoPosition toPosition = null;
     private Graph graph;
+    private String transportationMode = "car";
     //private DistanceCalculator distanceCal;
     
     public Form_Map() {
         initComponents();
         init();
         setupTextFields();
+        setupRadioButtons();
         graphHopper = new Model_GraphHopper();
         routeHopper = new Model_RouteHopper();
         graph = new Graph();
+    }
+    private void setupRadioButtons() {
+        walkingOption.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                transportationMode = "foot";
+            }
+        });
+        carOption.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                transportationMode = "car";
+            }
+        });
+
+        truckOption.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                transportationMode = "truck";
+            }
+        });
     }
         
     private void handleResponse(String response) {
@@ -155,9 +180,10 @@ public class Form_Map extends javax.swing.JPanel {
             // Fetch the route information in a separate thread to avoid blocking the UI
             GeoPosition finalFromPosition = fromPosition;
             GeoPosition finalToPosition = toPosition;
+            String finalTransportationMode = transportationMode;
             SwingUtilities.invokeLater(() -> {
                 try {
-                    String routeInfo = graphHopper.getRoute(finalFromPosition, finalToPosition);
+                    String routeInfo = graphHopper.getRoute(finalFromPosition, finalToPosition, finalTransportationMode);
                     String routeCoor = routeHopper.getConnection(finalFromPosition, finalToPosition);
                     System.out.println();
                     handleResponse(routeInfo);
@@ -190,13 +216,13 @@ public class Form_Map extends javax.swing.JPanel {
 
             // Add the new waypoint
             addWaypoint(newWaypoint);
-
+            String finalTransportationMode = transportationMode;
             // If both from and to positions are set, fetch the route
             if (fromPosition != null && toPosition != null) {
                 // Fetch the route information in a separate thread to avoid blocking the UI
                 new Thread(() -> {
                     try {
-                        String routeInfo = graphHopper.getRoute(fromPosition, toPosition);
+                        String routeInfo = graphHopper.getRoute(fromPosition, toPosition, finalTransportationMode);
                         String routeCoor = routeHopper.getConnection(fromPosition, toPosition);
                         SwingUtilities.invokeLater(() -> handleResponse(routeCoor));
                         System.out.println();

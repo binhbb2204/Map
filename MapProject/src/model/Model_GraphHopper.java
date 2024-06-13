@@ -23,28 +23,28 @@ public class Model_GraphHopper {
         this.apiKey = apiKey;
     }
 
-    public String getRoute(GeoPosition start, GeoPosition end) throws Exception {
-        String jsonPayload = createJsonPayload(start, end);
+    public String getRoute(GeoPosition start, GeoPosition end, String profile) throws Exception {
+        String jsonPayload = createJsonPayload(start, end, profile);
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://graphhopper.com/api/1/route?key=" + apiKey))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonPayload, StandardCharsets.UTF_8))
                 .build();
-
+    
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         int responseCode = response.statusCode();
         System.out.println("Response Code: " + responseCode);
         String responseBody = response.body();
-
+    
         // Determine routing mode
         String routingMode = "Flexible Mode"; // Since ch.disable=true & lm.disable=true
         System.out.println("Routing Mode: " + routingMode);
-        
+    
         // Update visited nodes count
         visitedNodesCount = calculateVisitedNodesCount(responseBody);
         System.out.println("Visited Nodes Count: " + visitedNodesCount);
-
+    
         return responseBody;
     }
 
@@ -117,15 +117,16 @@ public class Model_GraphHopper {
         return pathPoints;
     }
 
-    private String createJsonPayload(GeoPosition start, GeoPosition end) {
+    private String createJsonPayload(GeoPosition start, GeoPosition end, String profile) {
         return String.format(
             "{"
-            + "\"profile\":\"car\","
+            + "\"profile\":\"%s\","  // Use the profile parameter
             + "\"points\":[[%f,%f],[%f,%f]],"
             + "\"snap_preventions\":[\"motorway\",\"ferry\",\"tunnel\"],"
             + "\"details\":[\"road_class\",\"surface\"],"
             + "\"ch.disable\": true"
             + "}",
+            profile,  // Pass the profile parameter here
             start.getLongitude(), start.getLatitude(),
             end.getLongitude(), end.getLatitude()
         );
