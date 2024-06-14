@@ -1,7 +1,5 @@
 # Map Navigation
 
-![Project Logo or Screenshot](images/logo.jpg)
-
 ## Table of Contents
 
 - [Description](#description)
