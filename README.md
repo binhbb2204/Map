@@ -44,4 +44,4 @@ Huynh Lam Dang Khoa             ITCSIU21138                 https://github.com/h
 
 ## Acknowledgments
 
-youtube.com/watch?si=JySXINNA9CVIBx8h&v=TCtP_JUMHj8&feature=youtu.be
+[GitHub](https://www.youtube.com/watch?v=TCtP_JUMHj8&feature=youtu.be)
