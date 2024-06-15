@@ -76,7 +76,7 @@ public class ComboSuggestionUI extends BasicComboBoxUI {
     protected ComboPopup createPopup() {
         return new ComboSuggestionPopup(comboBox);
     }
-
+    
     @Override
     protected ListCellRenderer createRenderer() {
         return new ListCellRenderer() {
