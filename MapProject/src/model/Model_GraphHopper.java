@@ -120,7 +120,7 @@ public class Model_GraphHopper {
     private String createJsonPayload(GeoPosition start, GeoPosition end, String profile) {
         return String.format(
             "{"
-            + "\"profile\":\"%s\","  // Use the profile parameter
+            + "\"profile\":\"%s\"," 
             + "\"points\":[[%f,%f],[%f,%f]],"
             + "\"snap_preventions\":[\"motorway\",\"ferry\",\"tunnel\"],"
             + "\"details\":[\"road_class\",\"surface\"],"
