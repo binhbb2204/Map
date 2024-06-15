@@ -3,12 +3,14 @@ package main;
 import java.awt.*;
 import event.EventMenuSelected;
 import form.Form_Map;
+import form.Form_Map1;
 import glasspanepopup.GlassPanePopup;
 import swing.ScrollBar;
 import javax.swing.*;
 import java.util.*;
 public class Main extends javax.swing.JFrame {
     private Form_Map map;
+    private Form_Map1 map1;
     public Main() {
         GlassPanePopup.install(this);
         initComponents();
@@ -18,6 +20,7 @@ public class Main extends javax.swing.JFrame {
         pack();  // Adjusts the frame to fit the preferred size
         setLocationRelativeTo(null);
         map = new Form_Map();
+        map1 = new Form_Map1();
         menu.initMoving(Main.this);
         menu.addEventMenuSelected(new EventMenuSelected() {
             @Override
@@ -25,6 +28,9 @@ public class Main extends javax.swing.JFrame {
                 if(index == 1){
                     setForm(map);
                     System.out.println(index);
+                }
+                else if(index == 2){
+                    setForm(map1);
                 }
             }
         });
