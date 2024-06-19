@@ -11,6 +11,11 @@ public class RadioButton extends JRadioButton {
         setBackground(new Color(69, 124, 235));
     }
 
+    public RadioButton(String text) {
+        this(); // Call the default constructor
+        setText(text); // Set the text for the radio button
+    }
+
     @Override
     public void paint(Graphics grphcs) {
         super.paint(grphcs);

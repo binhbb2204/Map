@@ -19,7 +19,7 @@ public interface INode {
 
     public void setOpen(boolean open); //return if the node has been visited during the graph path search
 
-    public boolean isVisit(); // indicates whether or not the node has been visited during the graph path search
+    public boolean isVisited(); // indicates whether or not the node has been visited during the graph path search
 
     public void setVisited(boolean visited); // return true if the node has been selected to be part of the resulted path, else false
 

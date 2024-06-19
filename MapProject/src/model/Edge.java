@@ -27,6 +27,9 @@ public class Edge implements IEdge {
     public int getWeight() {
         return this.weight;
     }
+    public void setWeight(int weight) {
+		this.weight = weight;
+	}
     
     public void setNodeA(Node nodeA){
         this.nodeA = nodeA;

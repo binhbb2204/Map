@@ -4,33 +4,48 @@ import java.awt.*;
 import event.EventMenuSelected;
 import form.Form_Map;
 import form.Form_Map1;
+import form.Form_Maze;
+import form.Testing;
 import glasspanepopup.GlassPanePopup;
 import swing.ScrollBar;
+import view.PathFinder;
+
 import javax.swing.*;
 import java.util.*;
 public class Main extends javax.swing.JFrame {
     private Form_Map map;
+    private Form_Maze map2;
     private Form_Map1 map1;
+    private PathFinder pathFinder;
+    private Testing testing;
+    
     public Main() {
         GlassPanePopup.install(this);
         initComponents();
         setBackground(new Color(0, 0, 0, 0));
         
-        setPreferredSize(new Dimension(1500, 800));
-        pack();  // Adjusts the frame to fit the preferred size
+        //setPreferredSize(new Dimension(1200, 600));
+        //pack();
+        // Adjusts the frame to fit the preferred size
         setLocationRelativeTo(null);
         map = new Form_Map();
+        map2 = new Form_Maze();
         map1 = new Form_Map1();
+        pathFinder = new PathFinder();
+        testing = new Testing();
         menu.initMoving(Main.this);
         menu.addEventMenuSelected(new EventMenuSelected() {
             @Override
             public void selected(int index) {
                 if(index == 1){
                     setForm(map);
-                    System.out.println(index);
+                    pathFinder.close();
+                    
                 }
                 else if(index == 2){
-                    setForm(map1);
+                    setForm(map2);
+                    
+                    
                 }
             }
         });
@@ -75,26 +90,27 @@ public class Main extends javax.swing.JFrame {
         panelBorder1Layout.setHorizontalGroup(
             panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelBorder1Layout.createSequentialGroup()
-                .addComponent(menu, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(menu, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelBorder1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 917, Short.MAX_VALUE))
+                    .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBorder1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(exitButton)
-                        .addGap(1, 1, 1)))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(exitButton)))
                 .addContainerGap())
         );
         panelBorder1Layout.setVerticalGroup(
             panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(menu, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBorder1Layout.createSequentialGroup()
-                .addGap(7, 7, 7)
-                .addComponent(exitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 544, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGroup(panelBorder1Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(menu, javax.swing.GroupLayout.PREFERRED_SIZE, 617, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panelBorder1Layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addComponent(exitButton)
+                        .addGap(5, 5, 5)
+                        .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         getContentPane().add(panelBorder1, java.awt.BorderLayout.CENTER);
@@ -136,7 +152,12 @@ public class Main extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Main().setVisible(true);
+                Main main = new Main();
+                main.setVisible(true);
+
+                Rectangle bounds = main.panelBorder1.getBounds();
+                main.pathFinder.setSize(bounds.width, bounds.height);
+                main.pathFinder.setLocation(main.getX() + bounds.x, main.getY() + bounds.y);
             }
         });
     }

@@ -48,7 +48,7 @@ public class Node implements INode{
     }
 
     @Override
-    public boolean isVisit() {
+    public boolean isVisited() {
         return visited;
     }
 
