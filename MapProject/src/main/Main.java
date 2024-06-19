@@ -5,7 +5,6 @@ import event.EventMenuSelected;
 import form.Form_Map;
 import form.Form_Map1;
 import form.Form_Maze;
-import form.Testing;
 import glasspanepopup.GlassPanePopup;
 import swing.ScrollBar;
 import view.PathFinder;
@@ -17,33 +16,38 @@ public class Main extends javax.swing.JFrame {
     private Form_Maze map2;
     private Form_Map1 map1;
     private PathFinder pathFinder;
-    private Testing testing;
     
     public Main() {
         GlassPanePopup.install(this);
         initComponents();
         setBackground(new Color(0, 0, 0, 0));
         
-        //setPreferredSize(new Dimension(1200, 600));
-        //pack();
-        // Adjusts the frame to fit the preferred size
+        setPreferredSize(new Dimension(1520, 650));
+                    
+        pack();
         setLocationRelativeTo(null);
         map = new Form_Map();
         map2 = new Form_Maze();
         map1 = new Form_Map1();
         pathFinder = new PathFinder();
-        testing = new Testing();
         menu.initMoving(Main.this);
         menu.addEventMenuSelected(new EventMenuSelected() {
             @Override
             public void selected(int index) {
                 if(index == 1){
                     setForm(map);
-                    pathFinder.close();
+                    // setPreferredSize(new Dimension(1200, 600));
+                    
+                    // pack();
+                    // setLocationRelativeTo(null);
                     
                 }
                 else if(index == 2){
                     setForm(map2);
+                    // setPreferredSize(new Dimension(1500, 700));
+                    
+                    // pack();
+                    // setLocationRelativeTo(null);
                     
                     
                 }
@@ -73,6 +77,7 @@ public class Main extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
+        setPreferredSize(new java.awt.Dimension(1200, 617));
 
         panelBorder1.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -93,7 +98,7 @@ public class Main extends javax.swing.JFrame {
                 .addComponent(menu, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
+                    .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1024, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBorder1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(exitButton)))
@@ -102,15 +107,11 @@ public class Main extends javax.swing.JFrame {
         panelBorder1Layout.setVerticalGroup(
             panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelBorder1Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(panelBorder1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(menu, javax.swing.GroupLayout.PREFERRED_SIZE, 617, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(panelBorder1Layout.createSequentialGroup()
-                        .addGap(5, 5, 5)
-                        .addComponent(exitButton)
-                        .addGap(5, 5, 5)
-                        .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addGap(5, 5, 5)
+                .addComponent(exitButton)
+                .addGap(5, 5, 5)
+                .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 583, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(menu, javax.swing.GroupLayout.DEFAULT_SIZE, 617, Short.MAX_VALUE)
         );
 
         getContentPane().add(panelBorder1, java.awt.BorderLayout.CENTER);

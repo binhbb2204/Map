@@ -11,6 +11,7 @@ import component.PanelError;
 import glasspanepopup.GlassPanePopup;
 import matrix.AStarCostEvaluator;
 import matrix.MatrixNode;
+import model.DFSMazeAlgorithm;
 import model.Model_Error;
 import model.XAStarPathAlgorithm;
 import model.XMatrix;
@@ -19,6 +20,7 @@ import util.AWTUtil;
 public class Coordinator {
 	private component.PanelError Error = new PanelError(); 
     Map<Object, PropertyChangeSupport> supports = new HashMap<Object, PropertyChangeSupport>();
+	private final Random random = new Random();
 
     public void addPropertyChangeListener(Object source, PropertyChangeListener listener) {
 		PropertyChangeSupport support = supports.get(source);
@@ -146,6 +148,7 @@ public class Coordinator {
 		return true;
 	}
 
+	//to create random disabled blocks when generating a map
 	void generateMatrix(XMatrix matrix, int obstaclePercent) {
 		int rows = matrix.getRow();
 		int cols = matrix.getColumn();
@@ -158,7 +161,11 @@ public class Coordinator {
 			}
 		}
 	}
-
+	private void generateMaze(XMatrix matrix, int obstaclePercent) {
+        DFSMazeAlgorithm algorithm = new DFSMazeAlgorithm();
+        algorithm.generateMaze(matrix, random);
+  
+	}
 	PropertyChangeListener controlPanelListener = new PropertyChangeListener() {
 		@Override
 		public void propertyChange(PropertyChangeEvent evt) {
@@ -175,10 +182,21 @@ public class Coordinator {
 			}
 			else if (AppConstant.GenerateMapRequested.equals(evt.getPropertyName())) {
 				XMatrix src = null;
+				AppConstant.Painter currentPainter = controlPanel.getParameters().getPainter();
 				for (Pack pack : packs) {
 					if (src == null) {
 						src = pack.canvas.getMatrix();
-						generateMatrix(src, controlPanel.getParameters().getObstaclePercent());
+						if (currentPainter == AppConstant.Painter.DESTINATION) {
+							// Add logic for DESTINATION mode here
+							// For example, you might set a specific cell as the destination
+							generateMatrix(src, controlPanel.getParameters().getObstaclePercent());
+							// Logic for setting destination
+							// Example: src.setEnd(someDestinationNode);
+						} else if (currentPainter == AppConstant.Painter.DFS_MAZE) {
+							// Add logic for DFS_MAZE mode here
+							generateMatrix(src, controlPanel.getParameters().getObstaclePercent());
+							generateMaze(src, controlPanel.getParameters().getObstaclePercent());
+						}
 						pack.canvas.repaint();
 					}
 					else if (copyMatrix(src, pack.canvas.getMatrix())) {
