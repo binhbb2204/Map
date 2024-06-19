@@ -163,6 +163,8 @@ public class Coordinator {
 	}
 	private void generateMaze(XMatrix matrix, int obstaclePercent) {
         DFSMazeAlgorithm algorithm = new DFSMazeAlgorithm();
+		matrix.setStart(null);
+		matrix.setEnd(null);
         algorithm.generateMaze(matrix, random);
   
 	}
@@ -188,13 +190,10 @@ public class Coordinator {
 						src = pack.canvas.getMatrix();
 						if (currentPainter == AppConstant.Painter.DESTINATION) {
 							// Add logic for DESTINATION mode here
-							// For example, you might set a specific cell as the destination
 							generateMatrix(src, controlPanel.getParameters().getObstaclePercent());
 							// Logic for setting destination
-							// Example: src.setEnd(someDestinationNode);
 						} else if (currentPainter == AppConstant.Painter.DFS_MAZE) {
 							// Add logic for DFS_MAZE mode here
-							generateMatrix(src, controlPanel.getParameters().getObstaclePercent());
 							generateMaze(src, controlPanel.getParameters().getObstaclePercent());
 						}
 						pack.canvas.repaint();
