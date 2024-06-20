@@ -4,7 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
-
+import javax.swing.Timer;
 import javax.swing.JOptionPane;
 
 import component.PanelError;
@@ -20,7 +20,7 @@ import util.AWTUtil;
 public class Coordinator {
 	private component.PanelError Error = new PanelError(); 
     Map<Object, PropertyChangeSupport> supports = new HashMap<Object, PropertyChangeSupport>();
-	private final Random random = new Random();
+
 
     public void addPropertyChangeListener(Object source, PropertyChangeListener listener) {
 		PropertyChangeSupport support = supports.get(source);
@@ -50,6 +50,7 @@ public class Coordinator {
 		Canvas canvas;
 		XAStarPathAlgorithm algorithm;
 		AStarCostEvaluator evaluator;
+		DFSMazeAlgorithm dfsMazeAlgorithm;
 
 	}
 
@@ -161,13 +162,26 @@ public class Coordinator {
 			}
 		}
 	}
-	private void generateMaze(XMatrix matrix, int obstaclePercent) {
-        DFSMazeAlgorithm algorithm = new DFSMazeAlgorithm();
+    private void generateMazeStepByStep(XMatrix matrix, Pack pack) {
+	Timer timer = new Timer(25, null); 
 		matrix.setStart(null);
 		matrix.setEnd(null);
-        algorithm.generateMaze(matrix, random);
-  
-	}
+		timer.addActionListener(e -> {
+			if (!pack.dfsMazeAlgorithm.generateMazeStep()) {
+				((Timer) e.getSource()).stop();
+				GlassPanePopup.showPopup(Error);
+				Error.setData(new Model_Error("Maze generation is complete."));
+			}
+			for (Pack p : packs) {
+				if (p != pack) {
+					copyMatrix(matrix, p.canvas.getMatrix());
+					p.canvas.repaint();
+				}
+			}
+			pack.canvas.repaint();
+		});
+		timer.start();	
+	}    
 	PropertyChangeListener controlPanelListener = new PropertyChangeListener() {
 		@Override
 		public void propertyChange(PropertyChangeEvent evt) {
@@ -194,7 +208,8 @@ public class Coordinator {
 							// Logic for setting destination
 						} else if (currentPainter == AppConstant.Painter.DFS_MAZE) {
 							// Add logic for DFS_MAZE mode here
-							generateMaze(src, controlPanel.getParameters().getObstaclePercent());
+							pack.dfsMazeAlgorithm.initializeMaze(src);
+                            generateMazeStepByStep(src, pack);
 						}
 						pack.canvas.repaint();
 					}
@@ -228,6 +243,7 @@ public class Coordinator {
 		pack.canvas = canvas;
 		pack.algorithm = algorithm;
 		pack.evaluator = evaluator;
+		pack.dfsMazeAlgorithm = new DFSMazeAlgorithm();
 		canvas.addPropertyChangeListener(AppConstant.StartRequested, startRequestedListener);
 		canvas.addPropertyChangeListener(AppConstant.MapEdited, matrixEditedListener);
 		packs.add(pack);
