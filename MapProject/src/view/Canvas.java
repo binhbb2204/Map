@@ -14,11 +14,11 @@ import util.MathUtil;
 
 public class Canvas extends JComponent {
 
-	private final static Color LINE_COLOR           = Color.decode("#0052D4");
+	private final static Color LINE_COLOR           = Color.decode("#83a4d4");
 	private final static Color START_NODE_COLOR     = new Color(0, 255, 0);
 	private final static Color END_NODE_COLOR       = new Color(255, 0, 0);
 	private final static Color DISABLED_NODE_COLOR  = new Color(0, 0, 0);
-	private final static Color VISITED_NODE_COLOR   = new Color(155, 150, 250);
+	private final static Color VISITED_NODE_COLOR   = new Color(155, 150, 250, 150);
 	private final static Color SELECTED_NODE_COLOR  = Color.decode("#396afc");
 
 	private final static Stroke STROKE = new BasicStroke(1,BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER, 1.0f, new float[]{1}, 0);
@@ -126,8 +126,8 @@ public class Canvas extends JComponent {
 					g.setColor(DISABLED_NODE_COLOR);
 				}
 				else if (node.isSelected()) {
-					Color startColor = SELECTED_NODE_COLOR;
-                    Color endColor = Color.decode("#2948ff");
+					Color startColor = SELECTED_NODE_COLOR.brighter();
+                    Color endColor = Color.decode("#2948ff").brighter().brighter();
 
                     int x = left + cellsize * col;
                     int y = top + cellsize * row;
