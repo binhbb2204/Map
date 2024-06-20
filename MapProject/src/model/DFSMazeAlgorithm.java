@@ -1,51 +1,51 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import matrix.MatrixNode;
-import model.XMatrix;
 
 public class DFSMazeAlgorithm {
 
     private Random random;
+    private Stack<MatrixNode> stack;
+    private XMatrix matrix;
 
     public DFSMazeAlgorithm() {
         this.random = new Random();
+        this.stack = new Stack<>();
     }
 
-    public void generateMaze(XMatrix matrix, Random random) {
-        this.random = random;
-        initializeMaze(matrix);
-        int startRow = random.nextInt(matrix.getRow());
-        int startCol = random.nextInt(matrix.getColumn());
-        MatrixNode startNode = matrix.getValue(startRow, startCol);
-        startNode.setEnabled(true);
-        dfs(matrix, startNode);
-    }
-
-    private void initializeMaze(XMatrix matrix) {
+    public void initializeMaze(XMatrix matrix) {
+        this.matrix = matrix;
         for (int i = 0; i < matrix.getRow(); i++) {
             for (int j = 0; j < matrix.getColumn(); j++) {
                 matrix.getValue(i, j).setEnabled(false);
             }
         }
+        int startRow = random.nextInt(matrix.getRow());
+        int startCol = random.nextInt(matrix.getColumn());
+        MatrixNode startNode = matrix.getValue(startRow, startCol);
+        startNode.setEnabled(true);
+        stack.push(startNode);
     }
 
-    private void dfs(XMatrix matrix, MatrixNode node) {
-        List<MatrixNode> neighbors = getNeighbors(matrix, node);
+    public boolean generateMazeStep() {
+        if (stack.isEmpty()) {
+            return false;
+        }
+        MatrixNode current = stack.pop();
+        List<MatrixNode> neighbors = getNeighbors(matrix, current);
         Collections.shuffle(neighbors, random);
-
         for (MatrixNode neighbor : neighbors) {
             if (!neighbor.isEnabled()) {
-                // Knock down the wall between the current node and the neighbor
-                knockDownWall(matrix, node, neighbor);
+                knockDownWall(matrix, current, neighbor);
                 neighbor.setEnabled(true);
-                dfs(matrix, neighbor);
+                stack.push(current);
+                stack.push(neighbor);
+                break;
             }
         }
+        return true;
     }
 
     private List<MatrixNode> getNeighbors(XMatrix matrix, MatrixNode node) {
