@@ -5,7 +5,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 import javax.swing.Timer;
-import javax.swing.JOptionPane;
 
 import component.PanelError;
 import glasspanepopup.GlassPanePopup;
@@ -15,7 +14,6 @@ import model.DFSMazeAlgorithm;
 import model.Model_Error;
 import model.XAStarPathAlgorithm;
 import model.XMatrix;
-import util.AWTUtil;
 
 public class Coordinator {
 	private component.PanelError Error = new PanelError(); 
@@ -51,6 +49,7 @@ public class Coordinator {
 		XAStarPathAlgorithm algorithm;
 		AStarCostEvaluator evaluator;
 		DFSMazeAlgorithm dfsMazeAlgorithm;
+		Timer mazeTimer;
 
 	}
 
@@ -162,13 +161,29 @@ public class Coordinator {
 			}
 		}
 	}
+	
+	private void stopMazeTimers() {
+        for (Pack pack : packs) {
+            if (pack.mazeTimer != null) {
+                pack.mazeTimer.stop();
+                pack.mazeTimer = null;
+            }
+			pack.canvas.getMatrix().reset();
+            pack.canvas.repaint();
+			pack.canvas.validate();
+        }
+    }
+
     private void generateMazeStepByStep(XMatrix matrix, Pack pack) {
-	Timer timer = new Timer(25, null); 
+		stopMazeTimers();
+		matrix.reset();
+		Timer timer = new Timer(25, null); 
+		pack.mazeTimer = timer;
 		matrix.setStart(null);
 		matrix.setEnd(null);
 		timer.addActionListener(e -> {
 			if (!pack.dfsMazeAlgorithm.generateMazeStep()) {
-				((Timer) e.getSource()).stop();
+				timer.stop();
 				GlassPanePopup.showPopup(Error);
 				Error.setData(new Model_Error("Maze generation is complete."));
 			}
@@ -191,15 +206,19 @@ public class Coordinator {
 				}
 			}
 			else if (AppConstant.ClearMapRequested.equals(evt.getPropertyName()) ) {
+				stopMazeTimers();
 				for (Pack pack : packs) {
+					stopMazeTimers();
 					generateMatrix(pack.canvas.getMatrix(), 0);
 					pack.canvas.repaint();
 				}
 			}
 			else if (AppConstant.GenerateMapRequested.equals(evt.getPropertyName())) {
+				stopMazeTimers();
 				XMatrix src = null;
 				AppConstant.Painter currentPainter = controlPanel.getParameters().getPainter();
 				for (Pack pack : packs) {
+					
 					if (src == null) {
 						src = pack.canvas.getMatrix();
 						if (currentPainter == AppConstant.Painter.DESTINATION) {
@@ -219,7 +238,9 @@ public class Coordinator {
 				}
 			}
 			else if (AppConstant.StopRequested.equals(evt.getPropertyName())) {
+				stopMazeTimers();
 				for (Pack pack : packs) {
+					stopMazeTimers();
 					pack.evaluator.setEnabled(false);
 				}
 			}
@@ -227,6 +248,7 @@ public class Coordinator {
 				switch (controlPanel.getParameters().getMode()) {
 				case MAP_EDITING_MODE:
 					for (Pack pack : packs) {
+						stopMazeTimers();
 						pack.canvas.getMatrix().reset();
 						pack.canvas.repaint();
 					}
