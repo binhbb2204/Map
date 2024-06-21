@@ -26,7 +26,7 @@ public class AStarCostEvaluator implements ICostEvaluator {
     @Override
     public int evaluateHeuristic(INode node, INode start, INode end) {
         return factor * (Math.abs(((MatrixNode) node).getRow() - ((MatrixNode) end).getRow()) + Math.abs(((MatrixNode) node).getCol() - ((MatrixNode) end).getCol()));
-    }
+    }// this method use a formula called manhattan distance, very useful in machine learning
 
     @Override
     public int evaluateCost(INode candidate, IEdge edge, INode start, INode end) {
