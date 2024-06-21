@@ -177,7 +177,8 @@ public class Coordinator {
     private void generateMazeStepByStep(XMatrix matrix, Pack pack) {
 		stopMazeTimers();
 		matrix.reset();
-		Timer timer = new Timer(25, null); 
+		int interval = controlPanel.getParameters().getAnimationMs();
+		Timer timer = new Timer(interval, null); 
 		pack.mazeTimer = timer;
 		matrix.setStart(null);
 		matrix.setEnd(null);
