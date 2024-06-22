@@ -1,4 +1,4 @@
-# Map Navigation
+# Shortest Path Analysis
 
 ## Table of Contents
 
