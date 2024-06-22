@@ -87,10 +87,14 @@ public class Coordinator {
 						matrix.setStart(matrix.getValue(start.getRow(), start.getCol()));
 						matrix.reset();
 						matrix.evaluateHeuristic();
+						
 						algorithm.searchPath(matrix.getStart(), matrix.getEnd());
+		
+						long duration = algorithm.getRuntime();
 						canvas.repaint();
 						canvas.setEditable(true);
 						firePropertyChange(canvas, AppConstant.SearchCompleted, null, null);
+						firePropertyChange(canvas, AppConstant.SearchTime, null, duration);
 					}
 				};
 				Thread thread = new Thread(runnable);

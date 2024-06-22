@@ -104,7 +104,7 @@ public class Form_Maze extends javax.swing.JPanel {
             public void propertyChange(PropertyChangeEvent evt) {
                 Object source = evt.getSource();
                 String propertyName = evt.getPropertyName();
-                if (propertyName.equals(AppConstant.SearchStarted)) {
+                if (propertyName.equals(AppConstant.SearchStarted)){
                     SwingUtilities.invokeLater(() -> {
                         if (source == canvas1) {
                             canvasPanel1.setStatus("Searching...");
@@ -112,12 +112,25 @@ public class Form_Maze extends javax.swing.JPanel {
                             canvasPanel2.setStatus("Searching...");
                         }
                     });
-                } else if (propertyName.equals(AppConstant.SearchCompleted)) {
+                } 
+                else if (propertyName.equals(AppConstant.SearchCompleted)){
                     SwingUtilities.invokeLater(() -> {
                         if (source == canvas1) {
                             canvasPanel1.setStatus(format(canvas1.getMatrix()));
                         } else if (source == canvas2) {
                             canvasPanel2.setStatus(format(canvas2.getMatrix()));
+                        }
+                    });
+                }
+                else if (propertyName.equals(AppConstant.SearchTime)){
+                    // Update status with runtime
+                    SwingUtilities.invokeLater(() -> {
+                        long duration = (long) evt.getNewValue();
+                        String timeMessage = "runtime: " + duration + " ms";
+                        if (source == canvas1) {
+                            canvasPanel1.setStatus(canvasPanel1.statusLabel.getText() + ", " + timeMessage);
+                        } else if (source == canvas2) {
+                            canvasPanel2.setStatus(canvasPanel2.statusLabel.getText() + ", " + timeMessage);
                         }
                     });
                 }

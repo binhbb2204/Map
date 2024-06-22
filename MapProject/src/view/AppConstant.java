@@ -16,6 +16,7 @@ public class AppConstant {
 	
 	public final static String SearchStarted = "Search Started";
 	public final static String SearchCompleted = "Search Completed";
+	public final static String SearchTime = "Search Time";
 
 	public final static String ClearMapRequested = "Clear Map Requested";
 	public final static String GenerateMapRequested	= "Generate Map Requested";

@@ -7,6 +7,9 @@ import util.BinaryHeap;
 
 public class AStarPathAlgorithm implements IPathAlgorithm{
     private ICostEvaluator evaluator;
+    private int totalCost;
+    private int visitedNodes;
+    private long runtime;
 
     private final BinaryHeap<INode> binaryHeap = new BinaryHeap<INode>(new Comparator<INode>() {
         @Override
@@ -16,10 +19,16 @@ public class AStarPathAlgorithm implements IPathAlgorithm{
     });
     @Override
     public boolean searchPath(INode start, INode end) {
+        totalCost = 0;
+        visitedNodes = 0;
+        runtime = 0;
+
+        long startTime = System.currentTimeMillis();
         try{
             return search(start, end);
         }
         finally{
+            runtime = System.currentTimeMillis() - startTime;
             binaryHeap.clear();
         }
     }
@@ -97,5 +106,17 @@ public class AStarPathAlgorithm implements IPathAlgorithm{
 	public void setEvaluator(ICostEvaluator evaluator) {
 		this.evaluator = evaluator;
 	}
+
+    public int getTotalCost() {
+        return totalCost;
+    }
+
+    public int getVisitedNodes() {
+        return visitedNodes;
+    }
+
+    public long getRuntime() {
+        return runtime;
+    }
     
 }
