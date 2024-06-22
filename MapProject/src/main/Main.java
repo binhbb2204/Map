@@ -7,7 +7,7 @@ import form.Form_Map1;
 import form.Form_Maze;
 import glasspanepopup.GlassPanePopup;
 import swing.ScrollBar;
-import view.PathFinder;
+
 
 import javax.swing.*;
 import java.util.*;
@@ -15,7 +15,7 @@ public class Main extends javax.swing.JFrame {
     private Form_Map map;
     private Form_Maze map2;
     private Form_Map1 map1;
-    private PathFinder pathFinder;
+
     
     public Main() {
         GlassPanePopup.install(this);
@@ -29,7 +29,7 @@ public class Main extends javax.swing.JFrame {
         map = new Form_Map();
         map2 = new Form_Maze();
         map1 = new Form_Map1();
-        pathFinder = new PathFinder();
+
         menu.initMoving(Main.this);
         menu.addEventMenuSelected(new EventMenuSelected() {
             @Override
@@ -156,9 +156,6 @@ public class Main extends javax.swing.JFrame {
                 Main main = new Main();
                 main.setVisible(true);
 
-                Rectangle bounds = main.panelBorder1.getBounds();
-                main.pathFinder.setSize(bounds.width, bounds.height);
-                main.pathFinder.setLocation(main.getX() + bounds.x, main.getY() + bounds.y);
             }
         });
     }
