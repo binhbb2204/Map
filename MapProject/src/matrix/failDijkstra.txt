@@ -1,0 +1,60 @@
+
+package matrix;
+
+import model.INode;
+import model.IEdge;
+
+import java.util.*;
+
+public class DijkstraCostEvaluator extends AStarCostEvaluator {
+    @Override
+    public int evaluateHeuristic(INode node, INode start, INode end) {
+        return 0; // No heuristic used for Dijkstra
+    }
+
+    public Map<INode, Integer> dijkstra(INode start, INode end) {
+        Map<INode, Integer> distances = new HashMap<>();
+        Map<INode, INode> previousNodes = new HashMap<>();
+        Set<INode> visited = new HashSet<>();
+        List<INode> nodes = new ArrayList<>(getAllNodes());
+
+        // Initialize distances
+        for (INode node : nodes) {
+            distances.put(node, Integer.MAX_VALUE);
+        }
+        distances.put(start, 0);
+
+        while (!nodes.isEmpty()) {
+            // Simulate randomness by randomly picking a node instead of the node with the smallest distance
+            INode current = nodes.get(new Random().nextInt(nodes.size()));
+            nodes.remove(current);
+            visited.add(current);
+
+            if (current.equals(end)) {
+                break; // Reached the destination node
+            }
+
+            for (IEdge edge : current.getEdges()) {
+                INode neighbor = edge.getOpposite(current);
+                if (visited.contains(neighbor)) {
+                    continue;
+                }
+
+                // Introducing incorrect distance update mechanism
+                int newDist = distances.get(current) + edge.getWeight() + new Random().nextInt(10); // Adding randomness
+                if (newDist < distances.get(neighbor)) {
+                    distances.put(neighbor, newDist);
+                    previousNodes.put(neighbor, current);
+                }
+            }
+        }
+
+        return distances;
+    }
+
+    // This method should return all nodes in the graph
+    private Set<INode> getAllNodes() {
+        // Implement this method based on your graph structure
+        return new HashSet<>();
+    }
+}
